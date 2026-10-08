@@ -1,9 +1,6 @@
 import {Routes, Route} from 'react-router-dom'
 import Navbar from './componentes/organismos/Navbar'
-
 import Inicio from './paginas/Inicio'
-
-
 
 import "bootstrap/dist/css/bootstrap.min.css"
 
