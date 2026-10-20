@@ -1,19 +1,22 @@
 /* ==========================================================================
-   CONFIGURACIÓN GLOBAL Y VARIABLES BASE
+   CONFIGURACIÓN GLOBAL Y VARIABLES BASE (Fondo Blanco & Naranja)
    ========================================================================== */
 :root {
-  /* Paleta Light Mode (Gas & Energía) */
-  --text: #334155;
-  --text-h: #0f172a;
-  --bg: #f8fafc;
-  --border: #e2e8f0;
-  --code-bg: #f1f5f9;
-  --accent: #f97316;              /* Naranja Gas */
-  --accent-bg: rgba(249, 115, 22, 0.1);
-  --accent-border: rgba(249, 115, 22, 0.4);
-  --shadow: rgba(15, 23, 42, 0.08) 0 10px 15px -3px, rgba(15, 23, 42, 0.04) 0 4px 6px -2px;
+  /* Paleta Light de Gas & Energía */
+  --bg: #ffffff;                  /* Fondo Principal Blanco */
+  --bg-subtle: #fafafa;           /* Fondo secundario ligero */
+  --text: #334155;                /* Texto gris oscuro para legibilidad */
+  --text-h: #0f172a;              /* Títulos / Encabezados */
+  --border: #e2e8f0;              /* Bordes finos claros */
+  
+  /* Identidad Naranja */
+  --accent: #f97316;              /* Naranja Principal */
+  --accent-hover: #ea580c;        /* Naranja más oscuro para Hover */
+  --accent-bg: rgba(249, 115, 22, 0.08); /* Fondo con tinte naranja suave */
+  --accent-border: rgba(249, 115, 22, 0.3);
 
-  /* Fuentes */
+  /* Sombras y Tipografía */
+  --shadow: rgba(0, 0, 0, 0.05) 0 4px 12px;
   --sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --heading: 'Inter', system-ui, -apple-system, sans-serif;
   --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
@@ -21,28 +24,12 @@
   font-family: var(--sans);
   font-size: 16px;
   line-height: 1.5;
-  color-scheme: light dark;
   color: var(--text);
   background-color: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Soporte para Dark Mode Automático del Sistema */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #94a3b8;
-    --text-h: #f8fafc;
-    --bg: #0b0f19;
-    --border: #1e293b;
-    --code-bg: #1e293b;
-    --accent: #fb923c;
-    --accent-bg: rgba(251, 146, 60, 0.15);
-    --accent-border: rgba(251, 146, 60, 0.5);
-    --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
 }
 
 /* ==========================================================================
@@ -59,7 +46,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--bg);
+  background-color: var(--bg); /* Asegura que el body sea siempre blanco */
 }
 
 #root {
@@ -67,6 +54,7 @@ html, body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--bg);
 }
 
 /* ==========================================================================
@@ -99,12 +87,13 @@ code {
   font-family: var(--mono);
   font-size: 0.875rem;
   padding: 0.2rem 0.4rem;
-  background-color: var(--code-bg);
-  color: var(--text-h);
+  background-color: var(--bg-subtle);
+  color: var(--accent-hover);
+  border: 1px solid var(--border);
   border-radius: 4px;
 }
 
-/* Ajustes Responsivos de Tipografía */
+/* Ajustes Responsivos */
 @media (max-width: 1024px) {
   h1 {
     font-size: 1.75rem;
