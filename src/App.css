@@ -1,123 +1,47 @@
 /* ==========================================================================
-   1. VARIABLES DE ESTILO Y TEMAS (Design Tokens)
+   1. VARIABLES DE ESTILO Y TEMAS (Blanco + Naranja)
    ========================================================================== */
 :root {
-  /* Paleta de Colores Principal */
-  --primary: #0f172a;          /* Azul Oscuro Industrial */
-  --primary-hover: #1e293b;
-  --accent: #f97316;           /* Naranja Gas / Energía */
-  --accent-hover: #ea580c;
+  /* Identidad Naranja & Blanco */
+  --accent: #f97316;           /* Naranja Gas Principal */
+  --accent-hover: #ea580c;     /* Naranja más oscuro al pasar el mouse */
+  --accent-bg: rgba(249, 115, 22, 0.08); /* Fondo tenue naranja */
 
   /* Fondos y Superficies */
-  --bg-main: #f8fafc;          /* Fondo de la aplicación */
-  --bg-card: #ffffff;          /* Fondo de tarjetas y paneles */
-  --bg-sidebar: #0f172a;       /* Fondo del menú lateral */
+  --bg-main: #ffffff;          /* Fondo Principal Blanco */
+  --bg-card: #ffffff;          /* Fondo de Tarjetas Blanco */
+  --bg-subtle: #f8fafc;        /* Fondo gris muy sutil para contraste */
 
   /* Textos */
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-white: #ffffff;
+  --text-main: #0f172a;        /* Texto principal oscuro para alta legibilidad */
+  --text-muted: #64748b;       /* Texto secundario / gris */
 
   /* Indicadores de Estado del Gas */
-  --status-success: #22c55e;   /* Óptimo / Operativo */
-  --status-warning: #f59e0b;   /* Nivel Medio / Precaución */
-  --status-danger: #ef4444;    /* Crítico / Fuga / Detenido */
+  --status-success: #22c55e;   /* Óptimo / Operativo (Verde) */
+  --status-warning: #f59e0b;   /* Precaución / Nivel Medio (Amarillo) */
+  --status-danger: #ef4444;    /* Crítico / Fuga / Bajo (Rojo) */
 
   /* Bordes, Sombras y Tipografía */
   --border-color: #e2e8f0;
   --radius-sm: 6px;
   --radius-md: 10px;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
   --transition: all 0.2s ease-in-out;
 }
 
 /* ==========================================================================
-   2. REINICIO DE ESTILOS Y BASE
-   ========================================================================== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: var(--font-family);
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ==========================================================================
-   3. ESTRUCTURA Y LAYOUT DE LA APLICACIÓN
+   2. ESTRUCTURA PRINCIPAL (LAYOUT)
    ========================================================================== */
 .app-container {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  background-color: var(--bg-main);
 }
 
-/* Panel Lateral (Sidebar) */
-.app-sidebar {
-  width: 260px;
-  background-color: var(--bg-sidebar);
-  color: var(--text-white);
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem 1rem;
-  flex-shrink: 0;
-}
-
-.sidebar-logo {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  padding-left: 0.5rem;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: #94a3b8;
-  text-decoration: none;
-  border-radius: var(--radius-sm);
-  transition: var(--transition);
-  font-size: 0.95rem;
-}
-
-.nav-item:hover,
-.nav-item.active {
-  background-color: var(--primary-hover);
-  color: var(--text-white);
-}
-
-.nav-item.active {
-  border-left: 4px solid var(--accent);
-}
-
-/* Contenido Principal */
-.app-main {
-  flex: 1;
-  display: flex;
-  flex-direction: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-}
-
+/* Header / Barra de Navegación Superior */
 .app-header {
   height: 64px;
   background-color: var(--bg-card);
@@ -126,22 +50,58 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
+  box-shadow: var(--shadow-sm);
 }
 
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.brand-title span {
+  color: var(--accent);
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--accent);
+  background-color: var(--accent-bg);
+}
+
+/* Área de Contenido Principal */
 .app-content {
   padding: 2rem;
   flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ==========================================================================
-   4. COMPONENTES DEL DASHBOARD Y MÓDULO DE GAS
+   3. TARJETAS Y MÉTRICAS DEL MÓDULO DE GAS
    ========================================================================== */
-
-/* Rejilla de Métricas (Tarjetas de Control) */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
+  margin-top: 1.5rem;
   margin-bottom: 2rem;
 }
 
@@ -153,29 +113,28 @@ body {
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .metric-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
 .metric-title {
   font-size: 0.875rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .metric-value {
-  font-size: 1.875rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text-main);
 }
 
-/* Badges e Indicadores de Estado */
+/* Badges de Estado */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -184,7 +143,6 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .status-badge.success {
@@ -202,65 +160,32 @@ body {
   color: #b91c1c;
 }
 
-/* Barra de Progreso del Depósito de Gas */
+/* Barra de Nivel de Gas en Tanques */
 .tank-progress-bar {
   width: 100%;
-  height: 8px;
-  background-color: var(--border-color);
-  border-radius: 4px;
+  height: 10px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
   overflow: hidden;
-  margin-top: 0.75rem;
 }
 
 .tank-progress-fill {
   height: 100%;
-  border-radius: 4px;
+  border-radius: 9999px;
   transition: width 0.4s ease;
 }
 
-/* Tablas de Datos (Inventario, Estaciones, Pedidos) */
-.table-container {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.data-table th {
-  background-color: #f1f5f9;
-  color: var(--text-muted);
-  font-weight: 600;
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.data-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-main);
-}
-
-.data-table tr:hover {
-  background-color: #f8fafc;
-}
-
-/* Botones Principales */
+/* ==========================================================================
+   4. BOTONES Y TABLAS
+   ========================================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   border-radius: var(--radius-sm);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
   border: none;
@@ -269,35 +194,17 @@ body {
 
 .btn-primary {
   background-color: var(--accent);
-  color: var(--text-white);
+  color: #ffffff;
 }
 
 .btn-primary:hover {
   background-color: var(--accent-hover);
 }
 
-.btn-secondary {
-  background-color: #e2e8f0;
-  color: var(--text-main);
-}
-
-.btn-secondary:hover {
-  background-color: #cbd5e1;
-}
-
 /* ==========================================================================
-   5. DISEÑO ADAPTATIVO (Responsive Design)
+   5. DISEÑO ADAPTATIVO (RESPONSIVE)
    ========================================================================== */
 @media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-  }
-
-  .app-sidebar {
-    width: 100%;
-    padding: 1rem;
-  }
-
   .app-header {
     padding: 0 1rem;
   }
