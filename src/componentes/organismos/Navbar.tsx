@@ -37,6 +37,9 @@ function Navbar() {
             <Link className="nav-link text-white fw-semibold" to="/quienessomos">
               Quienes Somos
             </Link>
+            <Link className="nav-link text-white fw-semibold" to="/carrito">
+              Carrito
+            </Link>
           </div>
         </div>
       </div>
