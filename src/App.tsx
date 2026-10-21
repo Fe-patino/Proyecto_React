@@ -2,13 +2,11 @@ import { Routes, Route } from 'react-router-dom'
 import Navbar from './componentes/organismos/Navbar'
 import Inicio from './paginas/Inicio'
 import Contacto from './paginas/Contacto'
+import Carrito from './paginas/Carrito'
+import Quien from './paginas/Quien'
 
-// 1. Estilos base de Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css"
-
-// 2. Estilos personalizados (sobreescriben Bootstrap)
 import './index.css'
-import './App.css'
 
 function App() {
   return (
@@ -16,7 +14,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Inicio />} />
-        <Route path="/contacto" element={<Contacto/>} />
+        <Route path="/contacto" element={<Contacto />} />
+        <Route path="/carrito" element={<Carrito />} />
+        <Route path="/quienessomos" element={<Quien />} />
       </Routes>
     </>
   )
