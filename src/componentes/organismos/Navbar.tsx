@@ -37,8 +37,8 @@ function Navbar() {
             <Link className="nav-link text-white fw-semibold" to="/quienessomos">
               Quienes Somos
             </Link>
-            <Link className="nav-link text-white fw-semibold" to="/carrito">
-              Carrito
+            <Link className="nav-link" to="/carrito">
+             <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
             </Link>
           </div>
         </div>
