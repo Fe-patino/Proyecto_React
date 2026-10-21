@@ -36,12 +36,14 @@ function Navbar() {
             </Link>
             <Link className="nav-link text-white fw-semibold" to="/quienessomos">
               Quienes Somos
-            </Link>
-            
-            
+            </Link> 
             <Link className="nav-link" to="/carrito">
              <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
             </Link>
+            <Link className='nav-lin' to="/login">
+              <img src="/img/Login.png"alt="Login" width="28"height="28"/>
+            </Link>
+
           </div>
         </div>
       </div>

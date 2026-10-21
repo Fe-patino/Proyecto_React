@@ -9,6 +9,7 @@ import Footer from './componentes/organismos/Footer'
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import './index.css'
+import Login from './paginas/Login'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/quienessomos" element={<Quien />} />
+        <Route path="/login" element = {<Login/>}/>
       </Routes>
       <Footer />
       
