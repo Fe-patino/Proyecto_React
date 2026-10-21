@@ -40,7 +40,7 @@ function Navbar() {
             <Link className="nav-link" to="/carrito">
              <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
             </Link>
-            <Link className='nav-lin' to="/login">
+            <Link className="nav-link" to="/login">
               <img src="/img/Login.png"alt="Login" width="28"height="28"/>
             </Link>
 

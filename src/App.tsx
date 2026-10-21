@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './componentes/organismos/Navbar'
 import Inicio from './paginas/Inicio'
 import Contacto from './paginas/Contacto'
@@ -12,6 +12,8 @@ import './index.css'
 import Login from './paginas/Login'
 
 function App() {
+
+  const { pathname } = useLocation()
   return (
     <>
       <Navbar />
@@ -22,7 +24,7 @@ function App() {
         <Route path="/quienessomos" element={<Quien />} />
         <Route path="/login" element = {<Login/>}/>
       </Routes>
-      <Footer />
+      {pathname !== '/login' && <Footer />}
       
     </>
   )

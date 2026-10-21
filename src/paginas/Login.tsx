@@ -42,8 +42,15 @@ function Login() {
   })
 
   return (
-    <div className="container-fluid p-0">
-      <div className="row g-0" style={{ minHeight: '75vh' }}>
+    <div
+      className="container-fluid p-0"
+      style={{
+        minHeight: 'calc(100vh - 72px)',
+        background:
+          'linear-gradient(rgba(15,23,42,0.65), rgba(15,23,42,0.65)), url(/img/fondoLogin.png) center/cover no-repeat',
+      }}
+    >
+      <div className="row g-0" style={{ minHeight: 'calc(100vh - 72px)' }}>
 
         {/* Panel naranja con el formulario */}
         <div
@@ -111,15 +118,8 @@ function Login() {
           </form>
         </div>
 
-        {/* Panel derecho con mensaje (solo en pantallas grandes) */}
-        <div
-          className="col-lg-8 d-none d-lg-flex flex-column justify-content-center text-white p-5"
-          style={{
-
-            background:
-            'linear-gradient(rgba(15,23,42,0.65), rgba(15,23,42,0.65)), url(/img/fondoLogin.png) center/cover no-repeat',
-            }}
-        >
+        {/* Panel derecho con mensaje (transparente: deja ver la imagen de fondo) */}
+        <div className="col-lg-8 d-none d-lg-flex flex-column justify-content-center text-white p-5">
           <p className="fs-4 mb-1">Tienda en línea</p>
           <h1 className="display-5 fw-bold text-white">
             Tu gas, a domicilio en Chillán y la Región de Ñuble.
