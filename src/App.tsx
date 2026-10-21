@@ -4,6 +4,8 @@ import Inicio from './paginas/Inicio'
 import Contacto from './paginas/Contacto'
 import Carrito from './paginas/Carrito'
 import Quien from './paginas/Quien'
+import Footer from './componentes/organismos/Footer'
+
 
 import "bootstrap/dist/css/bootstrap.min.css"
 import './index.css'
@@ -18,6 +20,8 @@ function App() {
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/quienessomos" element={<Quien />} />
       </Routes>
+      <Footer />
+      
     </>
   )
 }
