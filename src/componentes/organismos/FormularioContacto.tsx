@@ -18,7 +18,6 @@ function FormularioContacto() {
       return;
     }
 
-    // RegEx para validar el formato del correo (corregida la lógica)
     const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!regexEmail.test(correo)) {
       alert("Ingrese un correo válido");
@@ -32,7 +31,6 @@ function FormularioContacto() {
 
     alert(`¡Formulario enviado correctamente!\n\nNombre: ${nombre}\nCorreo: ${correo}\nMensaje: ${mensaje}`);
     
-    // Limpiar campos después del envío
     setNombre("");
     setCorreo("");
     setMensaje("");
@@ -56,11 +54,14 @@ function FormularioContacto() {
         alCambiar={(e: React.ChangeEvent<HTMLInputElement>) => setCorreo(e.target.value)}
       />
 
-      <div className="mb-3">
-        <label className="form-label fw-semibold">Mensaje</label>
+      <div className="mb-3 text-start">
+        <label htmlFor="mensaje" className="form-label fw-semibold text-dark">
+          Mensaje
+        </label>
         <textarea
-          className="form-control"
+          id="mensaje"
           name="mensaje"
+          className="form-control"
           rows={4}
           placeholder="Escribe tu mensaje aquí..."
           value={mensaje}

@@ -21,7 +21,7 @@ test("2. Muestra una alerta cuando el correo está vacío", () => {
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre completo/i);
+  const campoNombre = screen.getByLabelText(/nombre/i);
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
 
   fireEvent.click(
@@ -37,8 +37,8 @@ test("3. Muestra una alerta cuando el correo no tiene un formato válido", () =>
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre completo/i);
-  const campoCorreo = screen.getByLabelText(/correo electrónico/i);
+  const campoNombre = screen.getByLabelText(/nombre/i);
+  const campoCorreo = screen.getByLabelText(/correo/i);
 
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "correo_invalido.com" } });
@@ -56,8 +56,8 @@ test("4. Muestra una alerta cuando el mensaje está vacío", () => {
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre completo/i);
-  const campoCorreo = screen.getByLabelText(/correo electrónico/i);
+  const campoNombre = screen.getByLabelText(/nombre/i);
+  const campoCorreo = screen.getByLabelText(/correo/i);
 
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
@@ -75,9 +75,9 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre completo/i) as HTMLInputElement;
-  const campoCorreo = screen.getByLabelText(/correo electrónico/i) as HTMLInputElement;
-  const campoMensaje = screen.getByPlaceholderText(/escribe tu mensaje aquí/i) as HTMLTextAreaElement;
+  const campoNombre = screen.getByLabelText(/nombre/i) as HTMLInputElement;
+  const campoCorreo = screen.getByLabelText(/correo/i) as HTMLInputElement;
+  const campoMensaje = screen.getByLabelText(/mensaje/i) as HTMLTextAreaElement;
 
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
@@ -91,7 +91,6 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
     expect.stringContaining("¡Formulario enviado correctamente!")
   );
 
-  // Verificación extra: los campos se resetean tras el envío
   expect(campoNombre.value).toBe("");
   expect(campoCorreo.value).toBe("");
   expect(campoMensaje.value).toBe("");

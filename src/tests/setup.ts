@@ -1,7 +1,4 @@
-// Se ejecuta antes de cada archivo de pruebas
-import "@testing-library/jest-dom/vitest";
-import { afterEach } from "vitest";
-import { cleanup } from "@testing-library/react";
+import { expect } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
 
-// Desmonta los componentes tras cada prueba para que sean independientes
-afterEach(() => cleanup());
+expect.extend(matchers);
