@@ -1,18 +1,21 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './componentes/organismos/Navbar'
 import Inicio from './paginas/Inicio'
 import Contacto from './paginas/Contacto'
 import Productos from './paginas/Productos'
 import DetalleProducto from './paginas/DetalleProducto'
+import Carrito from './paginas/Carrito'
+import Quien from './paginas/Quien'
+import Footer from './componentes/organismos/Footer'
 
-// 1. Estilos base de Bootstrap
+
 import "bootstrap/dist/css/bootstrap.min.css"
-
-// 2. Estilos personalizados (sobreescriben Bootstrap)
 import './index.css'
-import './App.css'
+import Login from './paginas/Login'
 
 function App() {
+
+  const { pathname } = useLocation()
   return (
     <>
       <Navbar />
@@ -21,7 +24,13 @@ function App() {
         <Route path="/productos" element={<Productos />} />
         <Route path="/producto/:id" element={<DetalleProducto />} />
         <Route path="/contacto" element={<Contacto/>} />
+        <Route path="/contacto" element={<Contacto />} />
+        <Route path="/carrito" element={<Carrito />} />
+        <Route path="/quienessomos" element={<Quien />} />
+        <Route path="/login" element = {<Login/>}/>
       </Routes>
+      {pathname !== '/login' && <Footer />}
+      
     </>
   )
 }
