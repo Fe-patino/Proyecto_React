@@ -1,5 +1,6 @@
+import type { Producto } from "../../paginas/Productos";
 import Boton from "../atomos/Boton"
-import type { Producto } from "../../tipos/Producto"
+
 
 interface CardProductoProps {
     producto: Producto;

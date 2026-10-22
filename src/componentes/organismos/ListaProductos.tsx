@@ -1,5 +1,5 @@
+import type { Producto } from "../../paginas/Productos";
 import CardProducto from "../moleculas/CardProducto"
-import type { Producto } from "../../tipos/Producto"
 
 interface ListaProductosProps {
     productos: Producto[];

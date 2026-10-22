@@ -22,29 +22,37 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menú de Navegación con enlaces claros */}
         <div className="collapse navbar-collapse" id="navbarNav">
-          <div className="navbar-nav ms-auto gap-2">
+
+          {/* Links a la izquierda, junto a la marca (me-auto empuja el resto a la derecha) */}
+          <div className="navbar-nav me-auto gap-2">
             <Link className="nav-link text-white fw-semibold" to="/">
               Inicio
             </Link>
             <Link className="nav-link text-white fw-semibold" to="/productos">
               Productos
             </Link>
+            <Link className="nav-link text-white fw-semibold" to="/novedades">
+              Novedades
+            </Link>
             <Link className="nav-link text-white fw-semibold" to="/contacto">
               Contacto
             </Link>
             <Link className="nav-link text-white fw-semibold" to="/quienessomos">
               Quienes Somos
-            </Link> 
+            </Link>
+          </div>
+
+          {/* Íconos a la derecha */}
+          <div className="navbar-nav gap-2">
             <Link className="nav-link" to="/carrito">
-             <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
+              <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
             </Link>
             <Link className="nav-link" to="/login">
-              <img src="/img/Login.png"alt="Login" width="28"height="28"/>
+              <img src="/img/Login.png" alt="Login" width="28" height="28" />
             </Link>
-
           </div>
+
         </div>
       </div>
     </nav>

@@ -10,6 +10,7 @@ import Carrito from './paginas/Carrito'
 import Quien from './paginas/Quien'
 import Login from './paginas/Login'
 import Administrador from './paginas/Administrador'
+import Novedades from './paginas/Novedades'
 
 function App() {
   // Ruta actual, por ejemplo "/login"
@@ -29,6 +30,7 @@ function App() {
         <Route path="/producto/:id" element={<DetalleProducto />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/carrito" element={<Carrito />} />
+        <Route path="/novedades" element={<Novedades/>}/>
         <Route path="/quienessomos" element={<Quien />} />
         <Route path="/login" element={<Login alIngresar={setSesion} />} />
 
