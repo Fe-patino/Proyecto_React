@@ -8,7 +8,7 @@ test("1. Muestra una alerta cuando el nombre está vacío", () => {
 
   render(<FormularioContacto />);
 
-  const botonEnviar = screen.getByText(/enviar/i);
+  const botonEnviar = screen.getByTestId("boton-enviar");
   fireEvent.click(botonEnviar);
 
   expect(alerta).toHaveBeenCalledWith("Debe ingresar su nombre");
@@ -23,7 +23,7 @@ test("2. Muestra una alerta cuando el correo está vacío", () => {
   const campoNombre = screen.getByLabelText(/nombre/i);
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
 
-  const botonEnviar = screen.getByText(/enviar/i);
+  const botonEnviar = screen.getByTestId("boton-enviar");
   fireEvent.click(botonEnviar);
 
   expect(alerta).toHaveBeenCalledWith("Debe ingresar su correo");
@@ -41,7 +41,7 @@ test("3. Muestra una alerta cuando el correo no tiene un formato válido", () =>
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "correo_invalido.com" } });
 
-  const botonEnviar = screen.getByText(/enviar/i);
+  const botonEnviar = screen.getByTestId("boton-enviar");
   fireEvent.click(botonEnviar);
 
   expect(alerta).toHaveBeenCalledWith("Ingrese un correo válido");
@@ -59,7 +59,7 @@ test("4. Muestra una alerta cuando el mensaje está vacío", () => {
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
 
-  const botonEnviar = screen.getByText(/enviar/i);
+  const botonEnviar = screen.getByTestId("boton-enviar");
   fireEvent.click(botonEnviar);
 
   expect(alerta).toHaveBeenCalledWith("Debe ingresar un mensaje");
@@ -79,7 +79,7 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
   fireEvent.change(campoMensaje, { target: { value: "Hola, solicito información sobre balones de gas" } });
 
-  const botonEnviar = screen.getByText(/enviar/i);
+  const botonEnviar = screen.getByTestId("boton-enviar");
   fireEvent.click(botonEnviar);
 
   expect(alerta).toHaveBeenCalledWith(

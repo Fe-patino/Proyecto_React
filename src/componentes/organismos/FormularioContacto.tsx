@@ -69,13 +69,14 @@ function FormularioContacto() {
         ></textarea>
       </div>
 
-      <button
+    <button
         type="submit"
+        data-testid="boton-enviar"
         className="btn w-100 text-white fw-bold"
         style={{ backgroundColor: '#f97316', borderColor: '#f97316' }}
-      >
+    >
         Enviar Mensaje
-      </button>
+    </button>
     </form>
   );
 }
