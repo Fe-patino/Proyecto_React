@@ -201,6 +201,11 @@
   background-color: var(--accent-hover);
 }
 
+/* Botones secundarios (Agregar, filtros de categoría): .btn global usa border: none */
+.btn-outline-secondary {
+  border: 1px solid #6c757d;
+}
+
 /* ==========================================================================
    5. DISEÑO ADAPTATIVO (RESPONSIVE)
    ========================================================================== */
