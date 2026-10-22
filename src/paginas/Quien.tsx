@@ -1,8 +1,6 @@
-import CardPersona from "../componentes/moleculas/CardPersona"
-
+import CardPersona from '../componentes/moleculas/CardPersona'
 
 function Quien() {
-  
   const equipo = [
     { nombre: 'Carla Muñoz', rol: 'Administradora', foto: '/img/carlamunoz.png' },
     { nombre: 'María Pérez', rol: 'Operadora de llamadas', foto: '/img/mariaperez.png' },
@@ -18,17 +16,40 @@ function Quien() {
 
   return (
     <>
-      {/* Encabezado con imagen de fondo */}
+      {/* Encabezado con imagen de fondo (igual que en el HTML original) */}
       <div
-        className="text-white py-5"
-        style={{
-          background:
-            'linear-gradient(rgba(15,23,42,0.65), rgba(15,23,42,0.65)), url(/img/nosotros.png) center/cover no-repeat #1e293b',
-        }}
+        className="d-flex align-items-center text-center"
+        style={{ position: 'relative', overflow: 'hidden', minHeight: '580px' }}
       >
-        <div className="container py-4">
-          <h1 className="text-white">Nosotros</h1>
-          <p className="fs-5 mb-0">Una historia de más de 25 años llevando gas a los hogares de Ñuble</p>
+        <img
+          src="/img/nosotros.png"
+          alt="Equipo de Gas El Volcán"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center center',
+            zIndex: 1,
+          }}
+        />
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            width: '100%',
+            padding: '46px 0',
+            background:
+              'linear-gradient(90deg, rgba(26,26,42,0.85) 0%, rgba(26,26,42,0.55) 55%, rgba(26,26,42,0.15) 100%)',
+          }}
+        >
+          <div className="container">
+            <h1 className="text-white m-0">Nosotros</h1>
+            <p className="mt-2 mb-0" style={{ color: '#C7C7D6' }}>
+              Una historia de más de 25 años llevando gas a los hogares de Ñuble
+            </p>
+          </div>
         </div>
       </div>
 
@@ -68,7 +89,7 @@ function Quien() {
           <div className="row g-4">
             {equipo.map((persona) => (
               <div className="col-6 col-md-3" key={persona.nombre}>
-                <CardPersona nombre={persona.nombre} rol={persona.rol} />
+                <CardPersona nombre={persona.nombre} rol={persona.rol} foto={persona.foto} />
               </div>
             ))}
           </div>
