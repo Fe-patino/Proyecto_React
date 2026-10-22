@@ -43,14 +43,14 @@ function Login() {
 
   return (
     <div
-      className="container-fluid p-0"
+      className="container-fluid p-0 d-flex"
       style={{
-        minHeight: 'calc(100vh - 72px)',
+        flex: 1,
         background:
           'linear-gradient(rgba(15,23,42,0.65), rgba(15,23,42,0.65)), url(/img/fondoLogin.png) center/cover no-repeat',
       }}
     >
-      <div className="row g-0" style={{ minHeight: 'calc(100vh - 72px)' }}>
+      <div className="row g-0 w-100">
 
         {/* Panel naranja con el formulario */}
         <div

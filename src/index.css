@@ -43,7 +43,7 @@
 
 html, body {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
   background-color: var(--bg); /* Asegura que el body sea siempre blanco */
@@ -93,7 +93,33 @@ code {
   border-radius: 4px;
 }
 
-/* Ajustes Responsivos */
+/* ==========================================================================
+   CLASES PROPIAS
+   ========================================================================== */
+
+/* Precio y totales en naranja (carrito, tarjetas, detalle) */
+.texto-precio {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* Imagen de la tarjeta de producto (catálogo) */
+.card-producto-img {
+  height: 200px;
+  object-fit: contain;
+  padding: 1rem;
+  background-color: var(--bg-subtle);
+}
+
+/* Imágenes del carrusel de la página de inicio */
+.carrusel-img {
+  height: 380px;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   AJUSTES RESPONSIVOS
+   ========================================================================== */
 @media (max-width: 1024px) {
   h1 {
     font-size: 1.75rem;
@@ -102,12 +128,9 @@ code {
     font-size: 1.25rem;
   }
 }
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
 
-footer {
-  margin-top: auto;
+@media (max-width: 576px) {
+  .carrusel-img {
+    height: 220px;
+  }
 }
