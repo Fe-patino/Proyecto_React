@@ -6,7 +6,7 @@ function Navbar() {
       <div className="container-fluid">
         {/* Marca / Logo */}
         <Link className="navbar-brand fw-bold text-white fs-4" to="/">
-          Mi Tienda <span style={{ color: '#f97316' }}>Gas el Volcán</span>
+          <span style={{ color: '#f97316' }}>Gas el Volcán</span>
         </Link>
 
         {/* Botón responsive para pantallas pequeñas */}
