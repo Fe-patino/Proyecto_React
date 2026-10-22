@@ -17,7 +17,7 @@ function Footer() {
           </div>
         </div>
         <p className="text-center border-top border-secondary py-3 mb-0 small">
-          © 2024 Distribuidora de Gas El Volcán. Proyecto académico DSY1104.
+          
         </p>
       </div>
     </footer>
