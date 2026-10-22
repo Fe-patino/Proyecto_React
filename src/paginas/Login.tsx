@@ -1,6 +1,13 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-function Login() {
+interface LoginProps {
+  alIngresar: (tipo: string) => void
+}
+
+function Login({ alIngresar }: LoginProps) {
+  const navegar = useNavigate()
+
   // "login" inicio de sesión, "registro" cuenta nueva, "recuperar" olvidé mi contraseña
   const [modo, setModo] = useState('login')
   const [tipo, setTipo] = useState('cliente')
@@ -52,6 +59,14 @@ function Login() {
     e.preventDefault()
     if (!validarCorreoYContrasena()) return
     alert('Datos ingresados correctamente')
+
+    // Guarda quién ingresó y lo lleva a su página
+    alIngresar(tipo)
+    if (tipo === 'administrador') {
+      navegar('/admin')
+    } else {
+      navegar('/')
+    }
   }
 
   const registrar = (e: React.SubmitEvent<HTMLFormElement>) => {
