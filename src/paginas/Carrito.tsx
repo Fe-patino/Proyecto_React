@@ -1,69 +1,61 @@
-import { Link } from "react-router-dom";
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import TablaCarrito from "../componentes/organismos/TablaCarrito"
+import ResumenCarrito from "../componentes/moleculas/ResumenCarrito"
+import { useCarrito } from "../useCarrito"
+import { obtenerProductos } from "../productosService"
+import { armarLineas, calcularTotal } from "../calculosCarrito"
+import type { Producto } from "./Productos"
 
-// Página del carrito: por ahora solo la interfaz (sin datos reales)
+// Lo que se guarda del carrito: solo el código del producto y la cantidad
+export interface ItemCarrito {
+  id: string;
+  cantidad: number;
+}
+
+// Un ítem unido a los datos completos de su producto (para mostrarlo en pantalla)
+export interface LineaCarrito {
+  producto: Producto;
+  cantidad: number;
+}
+
+// Página /carrito: toma los ítems del carrito, los une con los datos de cada producto
+// y muestra la tabla, el total y la confirmación del pedido
 function Carrito() {
+  const { items, cambiarCantidad, quitar, vaciar } = useCarrito()
+  const [pedidoConfirmado, setPedidoConfirmado] = useState(false)
+
+  const lineas = armarLineas(items, obtenerProductos())
+
+  const confirmar = () => {
+    vaciar()
+    setPedidoConfirmado(true)
+  }
+
   return (
     <div className="container mt-4">
       <h1>Mi carrito</h1>
       <p className="text-muted">Revisa los cilindros que seleccionaste antes de confirmar tu pedido</p>
 
-      <div className="table-responsive">
-        <table className="table align-middle bg-white">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Precio</th>
-              <th>Cantidad</th>
-              <th>Subtotal</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <img src="/img/gasde5k.png" alt="Cilindro GLP 5 kg" width="60" height="60" className="me-2" style={{ objectFit: "contain" }} />
-                Cilindro GLP 5 kg
-              </td>
-              <td>$6.500</td>
-              <td className="text-nowrap">
-                <button type="button" className="btn btn-sm btn-outline-secondary">−</button>
-                <span className="mx-2">2</span>
-                <button type="button" className="btn btn-sm btn-outline-secondary">+</button>
-              </td>
-              <td>$13.000</td>
-              <td>
-                <button type="button" className="btn btn-sm btn-outline-danger">Quitar</button>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <img src="/img/gasde11k.png" alt="Cilindro GLP 11 kg" width="60" height="60" className="me-2" style={{ objectFit: "contain" }} />
-                Cilindro GLP 11 kg
-              </td>
-              <td>$12.000</td>
-              <td className="text-nowrap">
-                <button type="button" className="btn btn-sm btn-outline-secondary">−</button>
-                <span className="mx-2">1</span>
-                <button type="button" className="btn btn-sm btn-outline-secondary">+</button>
-              </td>
-              <td>$12.000</td>
-              <td>
-                <button type="button" className="btn btn-sm btn-outline-danger">Quitar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <p className="texto-precio fs-4 mb-0">Total: $25.000</p>
-        <div className="d-flex gap-2">
-          <Link to="/productos" className="btn btn-outline-secondary">Seguir comprando</Link>
-          <button type="button" className="btn btn-primary">Confirmar pedido</button>
+      {pedidoConfirmado && (
+        <div className="alert alert-success" role="status">
+          Pedido registrado. Nos pondremos en contacto para coordinar la entrega.
         </div>
-      </div>
+      )}
+
+      {lineas.length === 0 ? (
+        <div className="text-center py-5">
+          <p>Tu carrito está vacío.</p>
+          <Link to="/productos" className="btn btn-primary">Ir a productos</Link>
+        </div>
+      ) : (
+        <>
+          <TablaCarrito lineas={lineas} alCambiarCantidad={cambiarCantidad} alQuitar={quitar} />
+          <ResumenCarrito total={calcularTotal(lineas)} alConfirmar={confirmar} />
+        </>
+      )}
     </div>
-  );
+  )
 }
 
-export default Carrito;
+export default Carrito

@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
+import { useCarrito } from '../../useCarrito';
 
 function Navbar() {
+  const { totalUnidades } = useCarrito();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow-sm">
       <div className="container-fluid">
         {/* Marca / Logo */}
         <Link className="navbar-brand fw-bold text-white fs-4" to="/">
-          <span style={{ color: '#f97316' }}>Gas el Volcán</span>
+          Mi Tienda <span style={{ color: '#f97316' }}>Gas el Volcán</span>
         </Link>
 
         {/* Botón responsive para pantallas pequeñas */}
@@ -22,37 +25,37 @@ function Navbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
+        {/* Menú de Navegación con enlaces claros */}
         <div className="collapse navbar-collapse" id="navbarNav">
-
-          {/* Links a la izquierda, junto a la marca (me-auto empuja el resto a la derecha) */}
-          <div className="navbar-nav me-auto gap-2">
+          <div className="navbar-nav ms-auto gap-2">
             <Link className="nav-link text-white fw-semibold" to="/">
               Inicio
             </Link>
             <Link className="nav-link text-white fw-semibold" to="/productos">
               Productos
             </Link>
-            <Link className="nav-link text-white fw-semibold" to="/novedades">
-              Novedades
-            </Link>
             <Link className="nav-link text-white fw-semibold" to="/contacto">
               Contacto
             </Link>
             <Link className="nav-link text-white fw-semibold" to="/quienessomos">
               Quienes Somos
-            </Link>
-          </div>
-
-          {/* Íconos a la derecha */}
-          <div className="navbar-nav gap-2">
-            <Link className="nav-link" to="/carrito">
+            </Link> 
+            <Link className="nav-link position-relative" to="/carrito">
               <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
+              {totalUnidades > 0 && (
+                <span
+                  className="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger"
+                  data-testid="contador-carrito"
+                >
+                  {totalUnidades}
+                </span>
+              )}
             </Link>
             <Link className="nav-link" to="/login">
-              <img src="/img/Login.png" alt="Login" width="28" height="28" />
+              <img src="/img/Login.png"alt="Login" width="28"height="28"/>
             </Link>
-          </div>
 
+          </div>
         </div>
       </div>
     </nav>

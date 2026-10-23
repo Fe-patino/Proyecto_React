@@ -1,4 +1,4 @@
-import type { Producto } from "./paginas/Productos";
+import type { Producto } from "../../paginas/Productos";
 
 export interface FiltroProductos {
   categoria: string; // "Todos" o el nombre de una categoría
