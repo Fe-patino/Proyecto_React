@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
-import { test, expect, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { test, expect, vi, afterEach } from "vitest";
+import { fireEvent, render, screen, cleanup } from "@testing-library/react";
 import FormularioContacto from "../componentes/organismos/FormularioContacto";
+
+// Limpia el DOM después de cada test para evitar componentes duplicados
+afterEach(() => {
+  cleanup();
+});
 
 test("1. Muestra una alerta cuando el nombre está vacío", () => {
   const alerta = vi.spyOn(window, "alert").mockImplementation(() => {});
@@ -20,7 +25,7 @@ test("2. Muestra una alerta cuando el correo está vacío", () => {
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre/i);
+  const campoNombre = screen.getByLabelText(/nombre completo/i);
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
 
   const botonEnviar = screen.getByTestId("boton-enviar");
@@ -35,8 +40,8 @@ test("3. Muestra una alerta cuando el correo no tiene un formato válido", () =>
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre/i);
-  const campoCorreo = screen.getByLabelText(/correo/i);
+  const campoNombre = screen.getByLabelText(/nombre completo/i);
+  const campoCorreo = screen.getByLabelText(/correo electrónico/i);
 
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "correo_invalido.com" } });
@@ -53,8 +58,8 @@ test("4. Muestra una alerta cuando el mensaje está vacío", () => {
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre/i);
-  const campoCorreo = screen.getByLabelText(/correo/i);
+  const campoNombre = screen.getByLabelText(/nombre completo/i);
+  const campoCorreo = screen.getByLabelText(/correo electrónico/i);
 
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
@@ -71,13 +76,13 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
 
   render(<FormularioContacto />);
 
-  const campoNombre = screen.getByLabelText(/nombre/i) as HTMLInputElement;
-  const campoCorreo = screen.getByLabelText(/correo/i) as HTMLInputElement;
+  const campoNombre = screen.getByLabelText(/nombre completo/i) as HTMLInputElement;
+  const campoCorreo = screen.getByLabelText(/correo electrónico/i) as HTMLInputElement;
   const campoMensaje = screen.getByLabelText(/mensaje/i) as HTMLTextAreaElement;
 
   fireEvent.change(campoNombre, { target: { value: "Juan Pérez" } });
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
-  fireEvent.change(campoMensaje, { target: { value: "Hola, solicito información sobre balones de gas" } });
+  fireEvent.change(campoMensaje, { target: { value: "Hola, solicito recarga de gas" } });
 
   const botonEnviar = screen.getByTestId("boton-enviar");
   fireEvent.click(botonEnviar);
@@ -86,6 +91,7 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
     expect.stringContaining("¡Formulario enviado correctamente!")
   );
 
+  // Verificación de reseteo
   expect(campoNombre.value).toBe("");
   expect(campoCorreo.value).toBe("");
   expect(campoMensaje.value).toBe("");
