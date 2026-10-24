@@ -4,7 +4,7 @@ function Contacto() {
   return (
     <div className="container my-5">
       <div className="row justify-content-center">
-        <div className="col-md-6">
+        <div className="col-md-6" data-testid="contenedor-grid">
           <div className="card shadow-sm border-0 p-4">
             <h2 className="text-dark fw-bold mb-3">Contacto</h2>
             <p className="text-muted mb-4">
