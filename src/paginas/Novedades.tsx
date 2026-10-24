@@ -20,7 +20,7 @@ const listaNovedades: Novedad[] = [
     contenidoCompleto:
       "Para garantizar la máxima seguridad en tu hogar, asegúrate de mantener el cilindro alejado de chispas o instalaciones eléctricas defectuosas. Nunca acuestes el cilindro ni lo guardes en subterráneos o espacios cerrados sin ventilación. Inspecciona periódicamente el regulador y la manguera flexible para verificar que no existan desgastes.",
     imagen:
-      "https://images.unsplash.com/photo-1585771724684-38269d6639fd?q=80&w=600&auto=format&fit=crop", // Reemplaza por tu imagen local si lo prefieres
+      "/img/novedades1.png", // Reemplaza por tu imagen local si lo prefieres
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ const listaNovedades: Novedad[] = [
     contenidoCompleto:
       "Una de las señales más claras es cuando la llama de tus cocinas cambia de un azul brillante a un tono amarillento o anaranjado irregular. También puedes notar una pérdida constante de presión al encender múltiples quemadores. Te recomendamos tener siempre un cilindro de repuesto o solicitar tu recarga con anticipación en Distribuidora Gas el Volcán.",
     imagen:
-      "https://images.unsplash.com/photo-1628102491629-778571d893a3?q=80&w=600&auto=format&fit=crop", // Reemplaza por tu imagen local si lo prefieres
+      "/img/novedades2.png", // Reemplaza por tu imagen local si lo prefieres
   },
 ];
 
@@ -72,7 +72,12 @@ function Novedades() {
                     src={novedad.imagen}
                     alt={novedad.titulo}
                     className="card-img-top"
-                    style={{ height: "240px", objectFit: "cover" }}
+                    style={{
+                      width: "100%",            // Ocupa todo el ancho del contenedor
+                      height: "300px",          // Mantiene altura fija uniforme
+                      objectFit: "cover",       // Ajusta la imagen sin deformarla
+                      objectPosition: "center"  // Centra la imagen
+                    }}
                   />
 
                   {/* Cuerpos de la Tarjeta */}
