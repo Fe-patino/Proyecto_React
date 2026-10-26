@@ -3,7 +3,7 @@ import FiltroCategorias from "../moleculas/FiltroCategorias"
 import BuscadorProductos from "../moleculas/BuscadorProductos"
 import ListaProductos from "./ListaProductos"
 import { CATEGORIAS, obtenerProductos } from "../../productosService"
-import { filtrarProductos } from "../moleculas/filtroProductos"
+import { filtrarProductos } from "../moleculas/FiltroProductos"
 import { useCarrito } from "../../useCarrito"
 
 // Organismo: arma el catálogo completo (filtros + buscador + lista) y maneja su estado
