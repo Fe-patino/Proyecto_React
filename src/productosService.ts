@@ -1,8 +1,6 @@
 /* =========================================================
    productosService.ts — Fuente de datos de productos
-   Los datos viven en memoria (no hay backend). Si más adelante
-   hay una API, solo habría que cambiar este archivo.
-   Datos según: DSY1104 - Catálogo Distribuidora Gas El Volcán
+   Implementa CRUD completo en memoria.
    ========================================================= */
 import type { Producto } from "./paginas/Productos";
 
@@ -13,7 +11,7 @@ export const CATEGORIAS = [
   "Accesorios",
 ];
 
-const PRODUCTOS: Producto[] = [
+let PRODUCTOS: Producto[] = [
   {
     id: "CL001",
     nombre: "Cilindro GLP 5 kg",
@@ -22,8 +20,8 @@ const PRODUCTOS: Producto[] = [
     precioComercial: 6000,
     stock: 80,
     imagen: "/img/gasde5k.png",
-    descripcionBreve: "Cilindro de gas licuado de petróleo 5 kg. Para uso residencial (cocina, calefacción pequeña).",
-    descripcionCompleta: "Cilindro de gas licuado de petróleo de 5 kg. Para uso residencial (cocina, calefacción pequeña). Es el formato más liviano y fácil de transportar dentro del hogar, compatible con reguladores domésticos estándar.",
+    descripcionBreve: "Cilindro de gas licuado de petróleo 5 kg. Para uso residencial.",
+    descripcionCompleta: "Cilindro de gas licuado de petróleo de 5 kg. Para uso residencial (cocina, calefacción pequeña).",
   },
   {
     id: "CL002",
@@ -34,7 +32,7 @@ const PRODUCTOS: Producto[] = [
     stock: 200,
     imagen: "/img/gasde11k.png",
     descripcionBreve: "Cilindro estándar doméstico. El más utilizado en hogares chilenos.",
-    descripcionCompleta: "Cilindro estándar doméstico. El más utilizado en hogares chilenos. Compatible con reguladores estándar de 1 etapa (28 mbar).",
+    descripcionCompleta: "Cilindro estándar doméstico. El más utilizado en hogares chilenos.",
   },
   {
     id: "CL003",
@@ -44,19 +42,8 @@ const PRODUCTOS: Producto[] = [
     precioComercial: 14500,
     stock: 90,
     imagen: "/img/gasde15k.png",
-    descripcionBreve: "Cilindro de mayor capacidad para hogares de alto consumo o locales pequeños.",
-    descripcionCompleta: "Cilindro de mayor capacidad para hogares de alto consumo o locales pequeños. Ofrece mayor autonomía entre recargas, reduciendo la frecuencia de pedidos.",
-  },
-  {
-    id: "CL004",
-    nombre: "Cilindro GLP 45 kg",
-    categoria: "Cilindros de Gas",
-    precio: 45000,
-    precioComercial: 40000,
-    stock: 30,
-    imagen: "/img/Cilindro.png",
-    descripcionBreve: "Cilindro industrial. Uso comercial: restaurantes, talleres, calefacción de locales.",
-    descripcionCompleta: "Cilindro industrial de 45 kg. Uso comercial: restaurantes, talleres, calefacción de locales de mayor tamaño.",
+    descripcionBreve: "Cilindro de mayor capacidad para hogares de alto consumo.",
+    descripcionCompleta: "Cilindro de mayor capacidad para hogares de alto consumo o locales pequeños.",
   },
   {
     id: "RG001",
@@ -66,30 +53,19 @@ const PRODUCTOS: Producto[] = [
     precioComercial: 8200,
     stock: 45,
     imagen: "/img/reguladordegasdomestico.png",
-    descripcionBreve: "Regulador de 1 etapa para cilindros 5, 11 y 15 kg. Presión de salida 28 mbar.",
-    descripcionCompleta: "Regulador de 1 etapa para cilindros de 5, 11 y 15 kg. Presión de salida 28 mbar. Compatible con la mayoría de los artefactos residenciales.",
+    descripcionBreve: "Regulador de 1 etapa para cilindros 5, 11 y 15 kg.",
+    descripcionCompleta: "Regulador de 1 etapa para cilindros de 5, 11 y 15 kg. Presión de salida 28 mbar.",
   },
   {
     id: "RG002",
-    nombre: "Regulador de alta presión",
-    categoria: "Reguladores",
-    precio: 18990,
-    precioComercial: 17000,
-    stock: 12,
-    imagen: "/img/reguladordepresion.png",
-    descripcionBreve: "Regulador para cocinas industriales o equipos de mayor consumo. Presión regulable.",
-    descripcionCompleta: "Regulador para cocinas industriales o equipos de mayor consumo, con presión regulable según la necesidad del artefacto conectado.",
-  },
-  {
-    id: "RG003",
     nombre: "Regulador dual (2 salidas)",
     categoria: "Reguladores",
     precio: 14990,
     precioComercial: 13500,
     stock: 18,
     imagen: "/img/reguladordual.png",
-    descripcionBreve: "Permite conectar dos artefactos simultáneamente al mismo cilindro.",
-    descripcionCompleta: "Regulador dual con 2 salidas que permite conectar dos artefactos simultáneamente al mismo cilindro, sin necesidad de desconectar uno para usar el otro.",
+    descripcionBreve: "Permite conectar dos artefactos simultáneamente.",
+    descripcionCompleta: "Regulador dual con 2 salidas que permite conectar dos artefactos simultáneamente.",
   },
   {
     id: "MG001",
@@ -100,83 +76,50 @@ const PRODUCTOS: Producto[] = [
     stock: 80,
     imagen: "/img/manguerade1,5.png",
     descripcionBreve: "Manguera flexible homologada. Diámetro interior 9mm.",
-    descripcionCompleta: "Manguera flexible homologada de 1,5 metros. Diámetro interior 9mm. Compatible con reguladores estándar.",
-  },
-  {
-    id: "MG002",
-    nombre: "Manguera gas 3 m",
-    categoria: "Mangueras y Conexiones",
-    precio: 6990,
-    precioComercial: 6200,
-    stock: 50,
-    imagen: "/img/gas3metros.png",
-    descripcionBreve: "Manguera larga para instalaciones donde el artefacto está alejado del cilindro.",
-    descripcionCompleta: "Manguera flexible homologada de 3 metros, ideal para instalaciones donde el artefacto está alejado del cilindro.",
-  },
-  {
-    id: "MG003",
-    nombre: "Abrazadera metálica",
-    categoria: "Mangueras y Conexiones",
-    precio: 990,
-    precioComercial: 800,
-    stock: 200,
-    imagen: "/img/mangueras.png",
-    descripcionBreve: "Abrazadera de acero para asegurar la conexión manguera-regulador y manguera-artefacto.",
-    descripcionCompleta: "Abrazadera de acero para asegurar la conexión manguera-regulador y manguera-artefacto, evitando fugas por mala fijación.",
-  },
-  {
-    id: "MG004",
-    nombre: "Kit conexión completo",
-    categoria: "Mangueras y Conexiones",
-    precio: 12990,
-    precioComercial: 11500,
-    stock: 25,
-    imagen: "/img/Kitconexióncompleto.png",
-    descripcionBreve: "Regulador + manguera 1.5m + abrazaderas. Todo lo necesario para instalar un cilindro nuevo.",
-    descripcionCompleta: "Kit conexión completo: incluye regulador, manguera de 1,5 m y abrazaderas. Todo lo necesario para instalar un cilindro nuevo de forma segura.",
+    descripcionCompleta: "Manguera flexible homologada de 1,5 metros. Diámetro interior 9mm.",
   },
   {
     id: "AC001",
-    nombre: "Carro porta cilindro 11/15 kg",
-    categoria: "Accesorios",
-    precio: 12990,
-    precioComercial: 11000,
-    stock: 20,
-    imagen: "/img/Carroportacilindro11&15 kg.png",
-    descripcionBreve: "Carro metálico con ruedas para transportar cilindros dentro del hogar con seguridad.",
-    descripcionCompleta: "Carro metálico con ruedas para transportar cilindros de 11 y 15 kg dentro del hogar con seguridad, reduciendo el esfuerzo físico y el riesgo de golpes.",
-  },
-  {
-    id: "AC002",
     nombre: "Tapa protectora para válvula",
     categoria: "Accesorios",
     precio: 1490,
     precioComercial: 1200,
     stock: 60,
     imagen: "/img/Tapaprotectoraválvula.png",
-    descripcionBreve: "Tapa de plástico ABS para proteger la válvula del cilindro durante el transporte.",
-    descripcionCompleta: "Tapa de plástico ABS para proteger la válvula del cilindro durante el transporte y almacenamiento, evitando golpes y el ingreso de suciedad.",
-  },
-  {
-    id: "AC003",
-    nombre: "Detector de gas a batería",
-    categoria: "Accesorios",
-    precio: 19990,
-    precioComercial: 17000,
-    stock: 8,
-    imagen: "/img/detectorgas.png",
-    descripcionBreve: "Sensor electroquímico. Alarma sonora y visual ante fuga de gas GLP o metano.",
-    descripcionCompleta: "Detector de gas a batería con sensor electroquímico. Emite alarma sonora y visual ante fuga de gas GLP o metano, funcionando incluso sin conexión eléctrica.",
+    descripcionBreve: "Tapa de plástico ABS para proteger la válvula del cilindro.",
+    descripcionCompleta: "Tapa de plástico ABS para proteger la válvula del cilindro durante el transporte.",
   },
 ];
 
-/** Devuelve una copia de la lista de productos. */
+let contadorId = 100;
+
+/** Devuelve una copia de la lista completa. */
 export function obtenerProductos(): Producto[] {
   return PRODUCTOS.map((p) => ({ ...p }));
 }
 
-/** Devuelve un producto por su código (ej: "CL002") o undefined si no existe. */
+/** Devuelve un producto por id, o undefined si no existe. */
 export function obtenerProductoPorId(id: string): Producto | undefined {
   const encontrado = PRODUCTOS.find((p) => p.id === id);
   return encontrado ? { ...encontrado } : undefined;
+}
+
+/** Agrega un nuevo producto y devuelve la lista actualizada. */
+export function agregarProducto(datos: Omit<Producto, "id">): Producto[] {
+  contadorId++;
+  const nuevo: Producto = { id: `PROD${contadorId}`, ...datos };
+  PRODUCTOS = [...PRODUCTOS, nuevo];
+  return obtenerProductos();
+}
+
+/** Actualiza un producto existente y devuelve la lista actualizada. */
+export function actualizarProducto(id: string, cambios: Partial<Omit<Producto, "id">>): Producto[] {
+  PRODUCTOS = PRODUCTOS.map((p) => (p.id === id ? { ...p, ...cambios } : p));
+  return obtenerProductos();
+}
+
+/** Elimina un producto por id y devuelve la lista actualizada. */
+export function eliminarProducto(id: string): Producto[] {
+  PRODUCTOS = PRODUCTOS.filter((p) => p.id !== id);
+  return obtenerProductos();
 }
