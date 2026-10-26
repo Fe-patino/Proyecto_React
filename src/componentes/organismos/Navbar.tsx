@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useCarrito } from '../../useCarrito';
 
-function Navbar() {
+interface NavbarProps {
+  esAdmin?: boolean;
+  alCerrarSesion?: () => void;
+}
+
+function Navbar({ esAdmin = false, alCerrarSesion }: NavbarProps) {
   const { totalUnidades } = useCarrito();
 
   return (
@@ -27,7 +32,7 @@ function Navbar() {
 
         {/* Menú de Navegación con enlaces claros */}
         <div className="collapse navbar-collapse" id="navbarNav">
-          <div className="navbar-nav ms-auto gap-2">
+          <div className="navbar-nav ms-auto gap-2 align-items-lg-center">
             <Link className="nav-link text-white fw-semibold" to="/">
               Inicio
             </Link>
@@ -42,7 +47,7 @@ function Navbar() {
             </Link>
             <Link className="nav-link text-white fw-semibold" to="/quienessomos">
               Quienes Somos
-            </Link> 
+            </Link>
             <Link className="nav-link position-relative" to="/carrito">
               <img src="/img/carrito.png" alt="Carrito" width="28" height="28" />
               {totalUnidades > 0 && (
@@ -54,10 +59,22 @@ function Navbar() {
                 </span>
               )}
             </Link>
-            <Link className="nav-link" to="/login">
-              <img src="/img/Login.png"alt="Login" width="28"height="28"/>
-            </Link>
 
+            {/* Con sesión de administrador: volver al panel o cerrar sesión; si no, el icono de login */}
+            {esAdmin ? (
+              <>
+                <Link className="btn btn-warning btn-sm fw-semibold" to="/admin">
+                  Panel admin
+                </Link>
+                <button className="btn btn-outline-light btn-sm" onClick={alCerrarSesion}>
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <Link className="nav-link" to="/login">
+                <img src="/img/Login.png" alt="Login" width="28" height="28" />
+              </Link>
+            )}
           </div>
         </div>
       </div>
