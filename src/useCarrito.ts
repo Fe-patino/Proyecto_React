@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { CarritoContexto } from "./componentes/moleculas/carritoContexto";
+import { CarritoContexto } from "./componentes/moleculas/CarritoContexto";
 
 // Acceso al carrito desde cualquier componente: const { items, agregar } = useCarrito()
 export function useCarrito() {

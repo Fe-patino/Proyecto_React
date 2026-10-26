@@ -1,5 +1,4 @@
 import { formatearPrecio } from "../../formatoPrecio";
-import type { Producto } from "../../paginas/Productos";
 import type { LineaCarrito } from "../../paginas/Carrito";
 
 interface FilaCarritoProps {

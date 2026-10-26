@@ -1,6 +1,5 @@
-import FilaCarrito from "../moleculas/filaCarrito";
-import type { Producto } from "../../paginas/Productos";
 import type { LineaCarrito } from "../../paginas/Carrito";
+import FilaCarrito from "../moleculas/FilaCarrito";
 
 interface TablaCarritoProps {
     lineas: LineaCarrito[];

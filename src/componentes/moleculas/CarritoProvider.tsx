@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { CarritoContexto } from "./carritoContexto";
+import { CarritoContexto } from "./CarritoContexto";
 import { obtenerProductoPorId } from "../../productosService";
 import type { ItemCarrito } from "../../paginas/Carrito";
 
