@@ -1,68 +1,133 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  obtenerProductos,
+  agregarProducto,
+  actualizarProducto,
+  eliminarProducto,
+  CATEGORIAS,
+} from '../productosService'
+import type { Producto } from './Productos'
 
 interface AdministradorProps {
   alCerrarSesion: () => void
 }
 
+type Vista = 'dashboard' | 'productos'
+
+const VACÍO: Omit<Producto, 'id'> = {
+  nombre: '',
+  categoria: CATEGORIAS[0],
+  precio: 0,
+  precioComercial: 0,
+  stock: 0,
+  imagen: '',
+  descripcionBreve: '',
+  descripcionCompleta: '',
+}
+
 function Administrador({ alCerrarSesion }: AdministradorProps) {
   const navegar = useNavigate()
+  const [vista, setVista] = useState<Vista>('dashboard')
+  const [productos, setProductos] = useState<Producto[]>(obtenerProductos())
+  const [busqueda, setBusqueda] = useState('')
+  const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [form, setForm] = useState<Omit<Producto, 'id'>>(VACÍO)
+  const [error, setError] = useState('')
 
   const cerrarSesion = () => {
     alCerrarSesion()
     navegar('/login')
   }
 
-  // Datos de ejemplo (más adelante vendrán del módulo de datos)
+  /* ── Filtro de búsqueda ── */
+  const productosFiltrados = productos.filter((p) =>
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.categoria.toLowerCase().includes(busqueda.toLowerCase())
+  )
+
+  /* ── Formulario ── */
+  const cambiarCampo = (campo: keyof typeof form, valor: string | number) => {
+    setForm((prev) => ({ ...prev, [campo]: valor }))
+  }
+
+  const abrirCrear = () => {
+    setEditandoId(null)
+    setForm(VACÍO)
+    setError('')
+    setMostrarFormulario(true)
+  }
+
+  const abrirEditar = (p: Producto) => {
+    setEditandoId(p.id)
+    const { id, ...resto } = p
+    void id
+    setForm(resto)
+    setError('')
+    setMostrarFormulario(true)
+  }
+
+  const cancelar = () => {
+    setMostrarFormulario(false)
+    setEditandoId(null)
+    setForm(VACÍO)
+    setError('')
+  }
+
+  const guardar = () => {
+    if (!form.nombre.trim()) { setError('El nombre es obligatorio'); return }
+    if (form.precio <= 0)    { setError('El precio debe ser mayor a 0'); return }
+    if (form.stock < 0)      { setError('El stock no puede ser negativo'); return }
+
+    if (editandoId) {
+      setProductos(actualizarProducto(editandoId, form))
+    } else {
+      setProductos(agregarProducto(form))
+    }
+    cancelar()
+  }
+
+  const eliminar = (id: string) => {
+    if (window.confirm('¿Eliminar este producto?')) {
+      setProductos(eliminarProducto(id))
+    }
+  }
+
+  /* ── Datos para el dashboard ── */
   const resumen = [
-    { titulo: 'Productos', valor: '14', detalle: 'en el catálogo' },
-    { titulo: 'Usuarios', valor: '3', detalle: 'registrados' },
-    { titulo: 'Pedidos', valor: '120', detalle: 'este mes' },
+    { titulo: 'Productos', valor: String(productos.length), detalle: 'en el catálogo' },
+    { titulo: 'Categorías', valor: String(CATEGORIAS.length), detalle: 'disponibles' },
+    { titulo: 'Stock total', valor: String(productos.reduce((s, p) => s + p.stock, 0)), detalle: 'unidades' },
   ]
-
-  const categorias = [
-    { nombre: 'Cilindros', porcentaje: 65 },
-    { nombre: 'Accesorios', porcentaje: 25 },
-    { nombre: 'Otros', porcentaje: 10 },
-  ]
-
-  const masVendidos = [
-    { nombre: 'Cilindro GLP 11 kg', categoria: 'Cilindros', precio: '$12.000', imagen: '/img/gasde11k.png' },
-    { nombre: 'Cilindro GLP 5 kg', categoria: 'Cilindros', precio: '$6.500', imagen: '/img/gasde5k.png' },
-  ]
-
-  const menu = ['Dashboard', 'Productos', 'Usuarios', 'Pedidos']
 
   const fecha = new Date().toLocaleDateString('es-CL', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
 
   return (
     <div className="container-fluid p-0">
       <div className="row g-0" style={{ minHeight: '80vh' }}>
 
-        {/* Menú lateral */}
+        {/* ── Menú lateral ── */}
         <div
           className="col-12 col-md-3 col-lg-2 p-3 text-white d-flex flex-column"
           style={{ background: 'linear-gradient(160deg, #fb923c, #f97316 50%, #ea580c)' }}
         >
           <h5 className="text-white fw-bold mb-4">Administración</h5>
-
           <div className="d-flex flex-md-column flex-wrap gap-1">
-            {menu.map((item, indice) => (
+            {(['dashboard', 'productos'] as Vista[]).map((v) => (
               <button
-                key={item}
+                key={v}
                 type="button"
-                className="btn text-start text-white fw-semibold"
-                style={{ background: indice === 0 ? 'rgba(255,255,255,0.25)' : 'transparent' }}
+                className="btn text-start text-white fw-semibold text-capitalize"
+                style={{ background: vista === v ? 'rgba(255,255,255,0.25)' : 'transparent' }}
+                onClick={() => { setVista(v); setMostrarFormulario(false) }}
               >
-                {item}
+                {v === 'dashboard' ? 'Dashboard' : 'Productos'}
               </button>
             ))}
           </div>
-
           <button
             type="button"
             className="btn btn-light fw-bold mt-3 mt-md-auto"
@@ -73,81 +138,167 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
           </button>
         </div>
 
-        {/* Contenido principal */}
+        {/* ── Contenido ── */}
         <div className="col-12 col-md-9 col-lg-10 p-3 p-lg-4 bg-light">
-          <div className="mb-4">
-            <h1 className="mb-0">Dashboard</h1>
-            <p className="text-muted text-capitalize">{fecha}</p>
-          </div>
 
-          {/* Tarjetas de resumen */}
-          <div className="row g-3 mb-4">
-            {resumen.map((r) => (
-              <div className="col-12 col-md-4" key={r.titulo}>
-                <div className="card border-0 shadow-sm h-100">
-                  <div className="card-body">
-                    <p className="text-muted mb-1">{r.titulo}</p>
-                    <h2 className="mb-0" style={{ color: '#f97316' }}>{r.valor}</h2>
-                    <small className="text-muted">{r.detalle}</small>
-                  </div>
-                </div>
+          {/* DASHBOARD */}
+          {vista === 'dashboard' && (
+            <>
+              <div className="mb-4">
+                <h1 className="mb-0">Dashboard</h1>
+                <p className="text-muted text-capitalize">{fecha}</p>
               </div>
-            ))}
-          </div>
-
-          <div className="row g-3">
-
-            {/* Productos por categoría (barras de progreso) */}
-            <div className="col-12 col-lg-5">
-              <div className="card border-0 shadow-sm h-100">
+              <div className="row g-3 mb-4">
+                {resumen.map((r) => (
+                  <div className="col-12 col-md-4" key={r.titulo}>
+                    <div className="card border-0 shadow-sm h-100">
+                      <div className="card-body">
+                        <p className="text-muted mb-1">{r.titulo}</p>
+                        <h2 className="mb-0" style={{ color: '#f97316' }}>{r.valor}</h2>
+                        <small className="text-muted">{r.detalle}</small>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="card border-0 shadow-sm">
                 <div className="card-body">
                   <h5 className="mb-3">Productos por categoría</h5>
-                  {categorias.map((c) => (
-                    <div className="mb-3" key={c.nombre}>
-                      <div className="d-flex justify-content-between small">
-                        <span>{c.nombre}</span>
-                        <span>{c.porcentaje}%</span>
-                      </div>
-                      <div className="progress" style={{ height: '10px' }}>
-                        <div
-                          className="progress-bar"
-                          role="progressbar"
-                          style={{ width: c.porcentaje + '%', backgroundColor: '#f97316' }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Lista de productos más vendidos */}
-            <div className="col-12 col-lg-7">
-              <div className="card border-0 shadow-sm h-100">
-                <div className="card-body">
-                  <h5 className="mb-3">Más vendidos</h5>
-                  {masVendidos.map((p) => (
-                    <div
-                      className="d-flex align-items-center justify-content-between border-bottom py-2"
-                      key={p.nombre}
-                    >
-                      <div className="d-flex align-items-center gap-3">
-                        <img src={p.imagen} alt={p.nombre} width="48" height="48" style={{ objectFit: 'contain' }} />
-                        <div>
-                          <div className="fw-semibold">{p.nombre}</div>
-                          <small className="text-muted">{p.categoria}</small>
+                  {CATEGORIAS.map((cat) => {
+                    const total = productos.filter((p) => p.categoria === cat).length
+                    const pct = productos.length ? Math.round((total / productos.length) * 100) : 0
+                    return (
+                      <div className="mb-3" key={cat}>
+                        <div className="d-flex justify-content-between small">
+                          <span>{cat}</span><span>{pct}%</span>
+                        </div>
+                        <div className="progress" style={{ height: '10px' }}>
+                          <div className="progress-bar" role="progressbar"
+                            style={{ width: pct + '%', backgroundColor: '#f97316' }} />
                         </div>
                       </div>
-                      <span className="texto-precio">{p.precio}</span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
-            </div>
+            </>
+          )}
 
-          </div>
+          {/* PRODUCTOS */}
+          {vista === 'productos' && (
+            <>
+              <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h1 className="mb-0">Gestión de Productos</h1>
+                {!mostrarFormulario && (
+                  <button className="btn btn-warning fw-bold" onClick={abrirCrear}>
+                    + Agregar producto
+                  </button>
+                )}
+              </div>
+
+              {/* ── Formulario crear / editar ── */}
+              {mostrarFormulario && (
+                <div className="card border-0 shadow-sm mb-4">
+                  <div className="card-body">
+                    <h5 className="mb-3">{editandoId ? 'Editar producto' : 'Nuevo producto'}</h5>
+                    {error && <div className="alert alert-danger py-2">{error}</div>}
+                    <div className="row g-3">
+                      <div className="col-12 col-md-6">
+                        <label className="form-label">Nombre *</label>
+                        <input className="form-control" value={form.nombre}
+                          onChange={(e) => cambiarCampo('nombre', e.target.value)} />
+                      </div>
+                      <div className="col-12 col-md-6">
+                        <label className="form-label">Categoría</label>
+                        <select className="form-select" value={form.categoria}
+                          onChange={(e) => cambiarCampo('categoria', e.target.value)}>
+                          {CATEGORIAS.map((c) => <option key={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <label className="form-label">Precio *</label>
+                        <input type="number" className="form-control" value={form.precio}
+                          onChange={(e) => cambiarCampo('precio', Number(e.target.value))} />
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <label className="form-label">Precio comercial</label>
+                        <input type="number" className="form-control" value={form.precioComercial}
+                          onChange={(e) => cambiarCampo('precioComercial', Number(e.target.value))} />
+                      </div>
+                      <div className="col-6 col-md-4">
+                        <label className="form-label">Stock *</label>
+                        <input type="number" className="form-control" value={form.stock}
+                          onChange={(e) => cambiarCampo('stock', Number(e.target.value))} />
+                      </div>
+                      <div className="col-12">
+                        <label className="form-label">Descripción breve</label>
+                        <input className="form-control" value={form.descripcionBreve}
+                          onChange={(e) => cambiarCampo('descripcionBreve', e.target.value)} />
+                      </div>
+                    </div>
+                    <div className="mt-3 d-flex gap-2">
+                      <button className="btn btn-warning fw-bold" onClick={guardar}>
+                        {editandoId ? 'Guardar cambios' : 'Crear producto'}
+                      </button>
+                      <button className="btn btn-outline-secondary" onClick={cancelar}>
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Buscador ── */}
+              <input
+                className="form-control mb-3"
+                placeholder="Buscar por nombre o categoría..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                data-testid="buscador-admin"
+              />
+
+              {/* ── Tabla de productos ── */}
+              <div className="card border-0 shadow-sm">
+                <div className="table-responsive">
+                  <table className="table table-hover mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productosFiltrados.length === 0 && (
+                        <tr><td colSpan={6} className="text-center text-muted py-3">Sin resultados</td></tr>
+                      )}
+                      {productosFiltrados.map((p) => (
+                        <tr key={p.id}>
+                          <td><small className="text-muted">{p.id}</small></td>
+                          <td>{p.nombre}</td>
+                          <td>{p.categoria}</td>
+                          <td>${p.precio.toLocaleString('es-CL')}</td>
+                          <td>{p.stock}</td>
+                          <td>
+                            <div className="d-flex gap-1">
+                              <button className="btn btn-sm btn-outline-primary"
+                                onClick={() => abrirEditar(p)}>Editar</button>
+                              <button className="btn btn-sm btn-outline-danger"
+                                onClick={() => eliminar(p.id)}>Eliminar</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-
       </div>
     </div>
   )
