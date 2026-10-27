@@ -57,7 +57,7 @@ test("3. Cambia al modo 'Crear cuenta' al hacer clic en '¿No estás registrado?
     const botonRegistro = screen.getByRole("button", { name: /¿no estás registrado\?/i });
     fireEvent.click(botonRegistro);
 
-  // Verificaciones con TypeScript nativo (sin rojo):
+    // Verificaciones con TypeScript nativo (sin rojo):
     expect(screen.getByRole("heading", { name: /crear cuenta/i })).toBeTruthy();
     expect(screen.getByLabelText(/nombre completo/i)).toBeTruthy();
 });
@@ -82,7 +82,27 @@ test("4. Inicia sesión correctamente con datos válidos", () => {
     fireEvent.click(botonSiguiente);
 
     expect(alerta).toHaveBeenCalledWith("Datos ingresados correctamente");
-    expect(funcionAlIngresar).toHaveBeenCalledWith("cliente");
+    expect(funcionAlIngresar).toHaveBeenCalledWith("cliente", "usuario@ejemplo.com");
+
+    alerta.mockRestore();
+});
+
+test("5. Inicia sesión como administrador al elegir esa pestaña", () => {
+    const alerta = vi.spyOn(window, "alert").mockImplementation(() => {});
+    const funcionAlIngresar = vi.fn();
+
+    render(
+        <MemoryRouter>
+            <Login alIngresar={funcionAlIngresar} />
+        </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /administrador/i }));
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "admin@gaselvolcan.cl" } });
+    fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: "admin123" } });
+    fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
+
+    expect(funcionAlIngresar).toHaveBeenCalledWith("administrador", "admin@gaselvolcan.cl");
 
     alerta.mockRestore();
 });
