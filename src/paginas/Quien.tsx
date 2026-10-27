@@ -2,10 +2,10 @@ import CardPersona from '../componentes/moleculas/CardPersona'
 
 function Quien() {
   const equipo = [
-    { nombre: 'Carla Muñoz', rol: 'Administradora', foto: '/img/carlamunoz.png' },
-    { nombre: 'María Pérez', rol: 'Operadora de llamadas', foto: '/img/mariaperez.png' },
-    { nombre: 'Juan Soto', rol: 'Repartidor', foto: '/img/juansoto.png' },
-    { nombre: 'Pedro Ramírez', rol: 'Repartidor', foto: '/img/pedroramirez.png' },
+    { nombre: 'Carla Muñoz', rol: 'Administradora', foto: '/img/carlamunos.png' },
+    { nombre: 'María Pérez', rol: 'Operadora de llamadas', foto: '/img/mariaPerez.png' },
+    { nombre: 'Juan Soto', rol: 'Repartidor', foto: '/img/juanSoto.png' },
+    { nombre: 'Pedro Ramírez', rol: 'Repartidor', foto: '/img/pedroRamirez.png' },
   ]
 
   const desarrolladores = [
