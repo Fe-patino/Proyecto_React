@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Navbar from './componentes/organismos/Navbar'
 import Footer from './componentes/organismos/Footer'
+import BannerBienvenida from './componentes/organismos/BannerBienvenida'
 import Inicio from './paginas/Inicio'
 import Contacto from './paginas/Contacto'
 import Productos from './paginas/Productos'
@@ -11,48 +12,46 @@ import Quien from './paginas/Quien'
 import Login from './paginas/Login'
 import Administrador from './paginas/Administrador'
 import Novedades from './paginas/Novedades'
-
-const CLAVE_SESION = 'gasElVolcan_sesion'
-
-// Lee la sesión guardada; si no hay nada, nadie ha iniciado sesión
-function leerSesion(): string {
-  try {
-    return sessionStorage.getItem(CLAVE_SESION) ?? ''
-  } catch {
-    return ''
-  }
-}
+import MiCuenta from './paginas/MiCuenta'
+import { crearSesion, guardarSesionLocal, leerSesion } from './sesion'
+import type { Sesion } from './sesion'
 
 function App() {
   // Ruta actual, por ejemplo "/login"
   const { pathname } = useLocation()
   const navegar = useNavigate()
 
-  // Quién inició sesión: "" (nadie), "cliente" o "administrador"
-  const [sesion, setSesion] = useState<string>(leerSesion)
-  const esAdmin = sesion === 'administrador'
+  // Quién inició sesión (null si nadie); se recupera al recargar la página
+  const [sesion, setSesion] = useState<Sesion | null>(leerSesion)
+  const esAdmin = sesion?.tipo === 'administrador'
 
-  const guardarSesion = (tipo: string) => {
-    setSesion(tipo)
-    try {
-      if (tipo) sessionStorage.setItem(CLAVE_SESION, tipo)
-      else sessionStorage.removeItem(CLAVE_SESION)
-    } catch {
-      // si el navegador bloquea el almacenamiento, la sesión dura mientras no se recargue
-    }
+  const iniciarSesion = (tipo: string, correo: string) => {
+    const nueva = crearSesion(tipo, correo)
+    setSesion(nueva)
+    guardarSesionLocal(nueva)
+  }
+
+  const quitarSesion = () => {
+    setSesion(null)
+    guardarSesionLocal(null)
   }
 
   // Cerrar sesión con advertencia previa
   const cerrarSesion = () => {
-    if (window.confirm('¿Seguro que desea cerrar la sesión de administrador?')) {
-      guardarSesion('')
+    const quien = esAdmin ? 'de administrador' : 'de usuario'
+    if (window.confirm('¿Seguro que desea cerrar la sesión ' + quien + '?')) {
+      quitarSesion()
       navegar('/login')
     }
   }
 
   return (
     <>
-      <Navbar esAdmin={esAdmin} alCerrarSesion={cerrarSesion} />
+      <Navbar sesion={sesion} alCerrarSesion={cerrarSesion} />
+
+      {/* Bienvenida solo en el inicio y solo con sesión iniciada */}
+      {sesion && pathname === '/' && <BannerBienvenida nombre={sesion.nombre} />}
+
       <Routes>
         <Route path="/" element={<Inicio />} />
         <Route path="/productos" element={<Productos />} />
@@ -62,12 +61,18 @@ function App() {
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/novedades" element={<Novedades />} />
         <Route path="/quienessomos" element={<Quien />} />
-        <Route path="/login" element={<Login alIngresar={guardarSesion} />} />
+        <Route
+          path="/login"
+          element={!sesion ? <Login alIngresar={iniciarSesion} /> : <Navigate to={esAdmin ? '/admin' : '/'} />}
+        />
+
+        {/* Perfil: solo con sesión iniciada */}
+        <Route path="/cuenta" element={sesion ? <MiCuenta sesion={sesion} /> : <Navigate to="/login" />} />
 
         {/* Solo entra el administrador; los demás vuelven al login */}
         <Route
           path="/admin"
-          element={esAdmin ? <Administrador alCerrarSesion={() => guardarSesion('')} /> : <Navigate to="/login" />}
+          element={esAdmin ? <Administrador alCerrarSesion={quitarSesion} /> : <Navigate to="/login" />}
         />
       </Routes>
 

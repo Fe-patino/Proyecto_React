@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 interface LoginProps {
-  alIngresar: (tipo: string) => void
+  alIngresar: (tipo: string, correo: string) => void
 }
 
 function Login({ alIngresar }: LoginProps) {
@@ -60,8 +60,8 @@ function Login({ alIngresar }: LoginProps) {
     if (!validarCorreoYContrasena()) return
     alert('Datos ingresados correctamente')
 
-    // Guarda quién ingresó y lo lleva a su página
-    alIngresar(tipo)
+    // Guarda quién ingresó (tipo y correo) y lo lleva a su página
+    alIngresar(tipo, correo)
     if (tipo === 'administrador') {
       navegar('/admin')
     } else {

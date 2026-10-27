@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom';
 import { useCarrito } from '../../useCarrito';
+import type { Sesion } from '../../sesion';
 
 interface NavbarProps {
-  esAdmin?: boolean;
+  sesion?: Sesion | null;
   alCerrarSesion?: () => void;
 }
 
-function Navbar({ esAdmin = false, alCerrarSesion }: NavbarProps) {
+function Navbar({ sesion = null, alCerrarSesion }: NavbarProps) {
   const { totalUnidades } = useCarrito();
+  const esAdmin = sesion?.tipo === 'administrador';
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow-sm">
@@ -60,15 +62,47 @@ function Navbar({ esAdmin = false, alCerrarSesion }: NavbarProps) {
               )}
             </Link>
 
-            {/* Con sesión de administrador: volver al panel o cerrar sesión; si no, el icono de login */}
-            {esAdmin ? (
+            {/* Con sesión: saludo y menú "Mi cuenta". Sin sesión: icono de login */}
+            {sesion ? (
               <>
-                <Link className="btn btn-warning btn-sm fw-semibold" to="/admin">
-                  Panel admin
-                </Link>
-                <button className="btn btn-outline-light btn-sm" onClick={alCerrarSesion}>
-                  Cerrar sesión
-                </button>
+                <span className="navbar-text text-white-50 small">Hola, {sesion.nombre}</span>
+                <div className="nav-item dropdown">
+                  <button
+                    className="btn btn-outline-light btn-sm dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Mi cuenta
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-end">
+                    {esAdmin && (
+                      <li>
+                        <Link className="dropdown-item" to="/admin">
+                          Panel admin
+                        </Link>
+                      </li>
+                    )}
+                    <li>
+                      <Link className="dropdown-item" to="/cuenta">
+                        Mi perfil
+                      </Link>
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" to="/carrito">
+                        Mi carrito
+                      </Link>
+                    </li>
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    <li>
+                      <button className="dropdown-item text-danger" type="button" onClick={alCerrarSesion}>
+                        Cerrar sesión
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </>
             ) : (
               <Link className="nav-link" to="/login">
