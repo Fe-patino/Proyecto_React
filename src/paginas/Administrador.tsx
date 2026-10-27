@@ -238,17 +238,20 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                       </div>
                       <div className="col-6 col-md-4">
                         <label className="form-label">Precio *</label>
-                        <input type="number" className="form-control" value={form.precio}
+                        <input type="number" min="0" step="5000" className="form-control" placeholder="0"
+                          value={form.precio === 0 ? '' : form.precio}
                           onChange={(e) => cambiarCampo('precio', Number(e.target.value))} />
                       </div>
                       <div className="col-6 col-md-4">
                         <label className="form-label">Precio comercial</label>
-                        <input type="number" className="form-control" value={form.precioComercial}
+                        <input type="number" min="0" step="5000" className="form-control" placeholder="0"
+                          value={form.precioComercial === 0 ? '' : form.precioComercial}
                           onChange={(e) => cambiarCampo('precioComercial', Number(e.target.value))} />
                       </div>
                       <div className="col-6 col-md-4">
                         <label className="form-label">Stock *</label>
-                        <input type="number" className="form-control" value={form.stock}
+                        <input type="number" min="0" className="form-control" placeholder="0"
+                          value={form.stock === 0 ? '' : form.stock}
                           onChange={(e) => cambiarCampo('stock', Number(e.target.value))} />
                       </div>
                       <div className="col-12">
