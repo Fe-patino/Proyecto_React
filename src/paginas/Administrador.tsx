@@ -15,6 +15,27 @@ interface AdministradorProps {
 
 type Vista = 'dashboard' | 'productos'
 
+const IMÁGENES = [
+  { ruta: '/img/balongas.png',               nombre: 'Balón de gas' },
+  { ruta: '/img/carlamunos.png',             nombre: 'Carla Muños' },
+  { ruta: '/img/carrito.png',                nombre: 'Carrito' },
+  { ruta: '/img/Carroportacilindro11&15 kg.png', nombre: 'Carro portacilindro 11&15 kg' },
+  { ruta: '/img/Cilindro.png',               nombre: 'Cilindro' },
+  { ruta: '/img/detectorgas.png',            nombre: 'Detector de gas' },
+  { ruta: '/img/gas3metros.png',             nombre: 'Gas 3 metros' },
+  { ruta: '/img/gasde5k.png',                nombre: 'Gas 5 kg' },
+  { ruta: '/img/gasde11k.png',               nombre: 'Gas 11 kg' },
+  { ruta: '/img/gasde15k.png',               nombre: 'Gas 15 kg' },
+  { ruta: '/img/Kitconexióncompleto.png',    nombre: 'Kit conexión completo' },
+  { ruta: '/img/manguerade1,5.png',          nombre: 'Manguera 1,5 m' },
+  { ruta: '/img/mangueras.png',              nombre: 'Mangueras' },
+  { ruta: '/img/reguladordegasdomestico.png',nombre: 'Regulador doméstico' },
+  { ruta: '/img/reguladordepresion.png',     nombre: 'Regulador de presión' },
+  { ruta: '/img/reguladordual.png',          nombre: 'Regulador dual' },
+  { ruta: '/img/reparto.png',                nombre: 'Reparto' },
+  { ruta: '/img/Tapaprotectoraválvula.png',  nombre: 'Tapa protectora válvula' },
+]
+
 const VACÍO: Omit<Producto, 'id'> = {
   nombre: '',
   categoria: CATEGORIAS[0],
@@ -235,6 +256,24 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                         <input className="form-control" value={form.descripcionBreve}
                           onChange={(e) => cambiarCampo('descripcionBreve', e.target.value)} />
                       </div>
+                      <div className="col-12 col-md-8">
+                        <label className="form-label">Imagen</label>
+                        <select className="form-select" value={form.imagen}
+                          onChange={(e) => cambiarCampo('imagen', e.target.value)}>
+                          <option value="">— Sin imagen —</option>
+                          {IMÁGENES.map((img) => (
+                            <option key={img.ruta} value={img.ruta}>{img.nombre}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="col-12 col-md-4 d-flex align-items-end">
+                        {form.imagen
+                          ? <img src={form.imagen} alt="preview" className="rounded border"
+                              style={{ height: 80, objectFit: 'contain' }} />
+                          : <div className="rounded border bg-white d-flex align-items-center justify-content-center text-muted"
+                              style={{ height: 80, width: 80, fontSize: 12 }}>Sin imagen</div>
+                        }
+                      </div>
                     </div>
                     <div className="mt-3 d-flex gap-2">
                       <button className="btn btn-warning fw-bold" onClick={guardar}>
@@ -264,6 +303,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                     <thead className="table-light">
                       <tr>
                         <th>ID</th>
+                        <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Categoría</th>
                         <th>Precio</th>
@@ -273,11 +313,17 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                     </thead>
                     <tbody>
                       {productosFiltrados.length === 0 && (
-                        <tr><td colSpan={6} className="text-center text-muted py-3">Sin resultados</td></tr>
+                        <tr><td colSpan={7} className="text-center text-muted py-3">Sin resultados</td></tr>
                       )}
                       {productosFiltrados.map((p) => (
                         <tr key={p.id}>
                           <td><small className="text-muted">{p.id}</small></td>
+                          <td>
+                            {p.imagen
+                              ? <img src={p.imagen} alt={p.nombre} style={{ height: 40, objectFit: 'contain' }} />
+                              : <span className="text-muted small">—</span>
+                            }
+                          </td>
                           <td>{p.nombre}</td>
                           <td>{p.categoria}</td>
                           <td>${p.precio.toLocaleString('es-CL')}</td>
