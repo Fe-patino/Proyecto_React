@@ -6,29 +6,29 @@ import { useCarrito } from "../useCarrito"
 import { obtenerProductos } from "../productosService"
 import { armarLineas, calcularTotal } from "../calculosCarrito"
 import type { Producto } from "./Productos"
+import FormularioPago from "../componentes/organismos/FormularioPago"
 
-// Lo que se guarda del carrito: solo el código del producto y la cantidad
 export interface ItemCarrito {
   id: string;
   cantidad: number;
 }
 
-// Un ítem unido a los datos completos de su producto (para mostrarlo en pantalla)
 export interface LineaCarrito {
   producto: Producto;
   cantidad: number;
 }
 
-// Página /carrito: toma los ítems del carrito, los une con los datos de cada producto
-// y muestra la tabla, el total y la confirmación del pedido
 function Carrito() {
   const { items, cambiarCantidad, quitar, vaciar } = useCarrito()
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false)
+  const [mostrarPago, setMostrarPago] = useState(false)
 
   const lineas = armarLineas(items, obtenerProductos())
+  const total = calcularTotal(lineas)
 
-  const confirmar = () => {
+  const alPagarExitoso = () => {
     vaciar()
+    setMostrarPago(false)
     setPedidoConfirmado(true)
   }
 
@@ -39,7 +39,7 @@ function Carrito() {
 
       {pedidoConfirmado && (
         <div className="alert alert-success" role="status">
-          Pedido registrado. Nos pondremos en contacto para coordinar la entrega.
+          Pago registrado correctamente. Nos pondremos en contacto para coordinar la entrega.
         </div>
       )}
 
@@ -48,10 +48,16 @@ function Carrito() {
           <p>Tu carrito está vacío.</p>
           <Link to="/productos" className="btn btn-primary">Ir a productos</Link>
         </div>
+      ) : mostrarPago ? (
+        <FormularioPago
+          total={total}
+          alPagarExitoso={alPagarExitoso}
+          alCancelar={() => setMostrarPago(false)}
+        />
       ) : (
         <>
           <TablaCarrito lineas={lineas} alCambiarCantidad={cambiarCantidad} alQuitar={quitar} />
-          <ResumenCarrito total={calcularTotal(lineas)} alConfirmar={confirmar} />
+          <ResumenCarrito total={total} alConfirmar={() => setMostrarPago(true)} />
         </>
       )}
     </div>
