@@ -1,54 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-// Interfaz para la estructura de cada noticia/novedad
 interface Novedad {
   id: number;
-  categoria: string;
   titulo: string;
-  resumen: string;
-  contenidoCompleto: string;
+  descripcion: string;
   imagen: string;
+  fechaPublicacion: string;
 }
 
-const listaNovedades: Novedad[] = [
-  {
-    id: 1,
-    categoria: "Consejos",
-    titulo: "Tips para almacenar tu cilindro de gas",
-    resumen:
-      "Guarda tu cilindro en un lugar ventilado, alejado de fuentes de calor y siempre en posición vertical. Aquí te contamos todo lo que debes saber.",
-    contenidoCompleto:
-      "Para garantizar la máxima seguridad en tu hogar, asegúrate de mantener el cilindro alejado de chispas o instalaciones eléctricas defectuosas. Nunca acuestes el cilindro ni lo guardes en subterráneos o espacios cerrados sin ventilación. Inspecciona periódicamente el regulador y la manguera flexible para verificar que no existan desgastes.",
-    imagen:
-      "/img/novedades1.png", // Reemplaza por tu imagen local si lo prefieres
-  },
-  {
-    id: 2,
-    categoria: "Consejos",
-    titulo: "¿Cómo saber cuándo recargar tu cilindro?",
-    resumen:
-      "Existen señales simples que te indican cuándo tu gas se está por acabar. Te enseñamos a reconocerlas antes de quedarte sin gas.",
-    contenidoCompleto:
-      "Una de las señales más claras es cuando la llama de tus cocinas cambia de un azul brillante a un tono amarillento o anaranjado irregular. También puedes notar una pérdida constante de presión al encender múltiples quemadores. Te recomendamos tener siempre un cilindro de repuesto o solicitar tu recarga con anticipación en Distribuidora Gas el Volcán.",
-    imagen:
-      "/img/novedades2.png", // Reemplaza por tu imagen local si lo prefieres
-  },
-];
-
 function Novedades() {
-  // Estado para rastrear qué tarjetas tienen desplegado el texto completo
+  const [novedades, setNovedades] = useState<Novedad[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState("");
   const [desplegados, setDesplegados] = useState<{ [key: number]: boolean }>({});
 
+  useEffect(() => {
+    fetch("http://localhost:8084/api/novedades")
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al cargar novedades");
+        return res.json();
+      })
+      .then((datos) => setNovedades(datos))
+      .catch(() => setError("No se pudieron cargar las novedades. Verifica que el servidor esté corriendo."))
+      .finally(() => setCargando(false));
+  }, []);
+
   const toggleDesplegar = (id: number) => {
-    setDesplegados((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setDesplegados((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
     <div className="w-100 bg-light pb-5">
-      {/* Encabezado con fondo oscuro como en la imagen */}
       <div className="text-white py-5 mb-5 text-center" style={{ backgroundColor: "#1e1b2e" }}>
         <div className="container">
           <h1 className="fw-bold display-5 mb-2 text-white">Novedades</h1>
@@ -58,58 +40,54 @@ function Novedades() {
         </div>
       </div>
 
-      {/* Grid de Tarjetas */}
       <div className="container">
+        {cargando && (
+          <p className="text-center text-muted">Cargando novedades...</p>
+        )}
+
+        {error && (
+          <p className="text-center text-danger">{error}</p>
+        )}
+
+        {!cargando && !error && novedades.length === 0 && (
+          <p className="text-center text-muted">No hay novedades disponibles.</p>
+        )}
+
         <div className="row g-4 justify-content-center">
-          {listaNovedades.map((novedad) => {
+          {novedades.map((novedad) => {
             const estaAbierto = !!desplegados[novedad.id];
+            const resumen = novedad.descripcion.length > 120
+              ? novedad.descripcion.slice(0, 120) + "..."
+              : novedad.descripcion;
 
             return (
               <div key={novedad.id} className="col-12 col-md-6 col-lg-5">
                 <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-                  {/* Imagen de la Noticia */}
-                  <img
-                    src={novedad.imagen}
-                    alt={novedad.titulo}
-                    className="card-img-top"
-                    style={{
-                      width: "100%",            // Ocupa todo el ancho del contenedor
-                      height: "300px",          // Mantiene altura fija uniforme
-                      objectFit: "cover",       // Ajusta la imagen sin deformarla
-                      objectPosition: "center"  // Centra la imagen
-                    }}
-                  />
-
-                  {/* Cuerpos de la Tarjeta */}
+                  {novedad.imagen && (
+                    <img
+                      src={novedad.imagen}
+                      alt={novedad.titulo}
+                      className="card-img-top"
+                      style={{ width: "100%", height: "300px", objectFit: "cover", objectPosition: "center" }}
+                    />
+                  )}
                   <div className="card-body p-4 d-flex flex-column justify-content-between">
                     <div>
-                      {/* Categoría en Naranja */}
-                      <span
-                        className="fw-bold small d-block mb-2"
-                        style={{ color: "#f97316" }}
-                      >
-                        {novedad.categoria}
+                      <span className="fw-bold small d-block mb-2" style={{ color: "#f97316" }}>
+                        {novedad.fechaPublicacion}
                       </span>
-
-                      {/* Título */}
                       <h3 className="card-title text-dark fw-bold h5 mb-3">
                         {novedad.titulo}
                       </h3>
-
-                      {/* Resumen */}
                       <p className="card-text text-muted mb-3" style={{ lineHeight: "1.6", textAlign: "justify" }}>
-                        {novedad.resumen}
+                        {resumen}
                       </p>
-
-                      {/* Texto Desplegable */}
                       {estaAbierto && (
                         <div className="mt-3 pt-3 border-top text-secondary small" style={{ lineHeight: "1.6", textAlign: "justify" }}>
-                          {novedad.contenidoCompleto}
+                          {novedad.descripcion}
                         </div>
                       )}
                     </div>
-
-                    {/* Botón Leer más / Leer menos */}
                     <button
                       onClick={() => toggleDesplegar(novedad.id)}
                       className="btn w-100 mt-4 fw-bold rounded-3 py-2 text-dark bg-transparent border-dark"
