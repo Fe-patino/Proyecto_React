@@ -5,8 +5,9 @@ function FormularioContacto() {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  const manejarEnvio = (e: React.FormEvent<HTMLFormElement>) => {
+  const manejarEnvio = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (nombre.trim() === "") {
@@ -17,23 +18,39 @@ function FormularioContacto() {
       alert("Debe ingresar su correo");
       return;
     }
-
     const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!regexEmail.test(correo)) {
       alert("Ingrese un correo válido");
       return;
     }
-
     if (mensaje.trim() === "") {
       alert("Debe ingresar un mensaje");
       return;
     }
 
-    alert(`¡Formulario enviado correctamente!\n\nNombre: ${nombre}\nCorreo: ${correo}\nMensaje: ${mensaje}`);
-    
-    setNombre("");
-    setCorreo("");
-    setMensaje("");
+    setCargando(true);
+    try {
+      const res = await fetch("http://localhost:8083/api/contactos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombreCompleto: nombre,
+          correo: correo,
+          mensaje: mensaje,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Error del servidor");
+
+      alert("¡Mensaje enviado correctamente! Pronto nos pondremos en contacto.");
+      setNombre("");
+      setCorreo("");
+      setMensaje("");
+    } catch {
+      alert("No se pudo enviar el mensaje. Verifica que el servidor esté corriendo.");
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
@@ -69,14 +86,15 @@ function FormularioContacto() {
         ></textarea>
       </div>
 
-    <button
+      <button
         type="submit"
         data-testid="boton-enviar"
         className="btn w-100 text-white fw-bold"
-        style={{ backgroundColor: '#f97316', borderColor: '#f97316' }}
-    >
-        Enviar Mensaje
-    </button>
+        style={{ backgroundColor: "#f97316", borderColor: "#f97316" }}
+        disabled={cargando}
+      >
+        {cargando ? "Enviando..." : "Enviar Mensaje"}
+      </button>
     </form>
   );
 }
