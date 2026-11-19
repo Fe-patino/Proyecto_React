@@ -60,7 +60,8 @@ const VACÍO: Omit<Producto, 'id'> = {
 function Administrador({ alCerrarSesion }: AdministradorProps) {
   const navegar = useNavigate()
   const [vista, setVista] = useState<Vista>('dashboard')
-  const [productos, setProductos] = useState<Producto[]>(obtenerProductos())
+  // Productos se carga desde el backend al montar el componente
+  const [productos, setProductos] = useState<Producto[]>([])
   const [busqueda, setBusqueda] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [editandoId, setEditandoId] = useState<string | null>(null)
@@ -71,6 +72,11 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
   const [pagos, setPagos] = useState<Pago[]>([])
   const [cargandoPagos, setCargandoPagos] = useState(false)
   const [errorPagos, setErrorPagos] = useState('')
+
+  // Cargar productos desde ms-productos al montar el componente
+  useEffect(() => {
+    obtenerProductos().then(setProductos)
+  }, [])
 
   useEffect(() => {
     if (vista === 'pagos') {
