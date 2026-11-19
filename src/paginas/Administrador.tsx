@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   obtenerProductos,
@@ -13,7 +13,17 @@ interface AdministradorProps {
   alCerrarSesion: () => void
 }
 
-type Vista = 'dashboard' | 'productos'
+type Vista = 'dashboard' | 'productos' | 'pagos'
+
+interface Pago {
+  id: number
+  nombreCliente: string
+  correoCliente: string
+  total: number
+  ultimosDigitos: string
+  estado: string
+  fechaPago: string
+}
 
 const IMÁGENES = [
   { ruta: '/img/balongas.png',               nombre: 'Balón de gas' },
@@ -57,28 +67,37 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
   const [form, setForm] = useState<Omit<Producto, 'id'>>(VACÍO)
   const [error, setError] = useState('')
 
+  // Estado para pagos
+  const [pagos, setPagos] = useState<Pago[]>([])
+  const [cargandoPagos, setCargandoPagos] = useState(false)
+  const [errorPagos, setErrorPagos] = useState('')
+
+  useEffect(() => {
+    if (vista === 'pagos') {
+      setCargandoPagos(true)
+      fetch('http://localhost:8085/api/pagos')
+        .then((res) => { if (!res.ok) throw new Error(); return res.json() })
+        .then((datos) => setPagos(datos))
+        .catch(() => setErrorPagos('No se pudieron cargar los pagos.'))
+        .finally(() => setCargandoPagos(false))
+    }
+  }, [vista])
+
   const cerrarSesion = () => {
     alCerrarSesion()
     navegar('/login')
   }
 
-  /* ── Filtro de búsqueda ── */
   const productosFiltrados = productos.filter((p) =>
     p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
     p.categoria.toLowerCase().includes(busqueda.toLowerCase())
   )
 
-  /* ── Formulario ── */
   const cambiarCampo = (campo: keyof typeof form, valor: string | number) => {
     setForm((prev) => ({ ...prev, [campo]: valor }))
   }
 
-  const abrirCrear = () => {
-    setEditandoId(null)
-    setForm(VACÍO)
-    setError('')
-    setMostrarFormulario(true)
-  }
+  const abrirCrear = () => { setEditandoId(null); setForm(VACÍO); setError(''); setMostrarFormulario(true) }
 
   const abrirEditar = (p: Producto) => {
     setEditandoId(p.id)
@@ -89,33 +108,26 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
     setMostrarFormulario(true)
   }
 
-  const cancelar = () => {
-    setMostrarFormulario(false)
-    setEditandoId(null)
-    setForm(VACÍO)
-    setError('')
-  }
+  const cancelar = () => { setMostrarFormulario(false); setEditandoId(null); setForm(VACÍO); setError('') }
 
   const guardar = () => {
     if (!form.nombre.trim()) { setError('El nombre es obligatorio'); return }
     if (form.precio <= 0)    { setError('El precio debe ser mayor a 0'); return }
     if (form.stock < 0)      { setError('El stock no puede ser negativo'); return }
-
     if (editandoId) {
-      setProductos(actualizarProducto(editandoId, form))
+      actualizarProducto(editandoId, form).then(setProductos)
     } else {
-      setProductos(agregarProducto(form))
+      agregarProducto(form).then(setProductos)
     }
     cancelar()
   }
 
   const eliminar = (id: string) => {
     if (window.confirm('¿Eliminar este producto?')) {
-      setProductos(eliminarProducto(id))
+      eliminarProducto(id).then(setProductos)
     }
   }
 
-  /* ── Datos para el dashboard ── */
   const resumen = [
     { titulo: 'Productos', valor: String(productos.length), detalle: 'en el catálogo' },
     { titulo: 'Categorías', valor: String(CATEGORIAS.length), detalle: 'disponibles' },
@@ -130,14 +142,14 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
     <div className="container-fluid p-0">
       <div className="row g-0" style={{ minHeight: '80vh' }}>
 
-        {/* ── Menú lateral ── */}
+        {/* Menú lateral */}
         <div
           className="col-12 col-md-3 col-lg-2 p-3 text-white d-flex flex-column"
           style={{ background: 'linear-gradient(160deg, #fb923c, #f97316 50%, #ea580c)' }}
         >
           <h5 className="text-white fw-bold mb-4">Administración</h5>
           <div className="d-flex flex-md-column flex-wrap gap-1">
-            {(['dashboard', 'productos'] as Vista[]).map((v) => (
+            {(['dashboard', 'productos', 'pagos'] as Vista[]).map((v) => (
               <button
                 key={v}
                 type="button"
@@ -145,7 +157,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                 style={{ background: vista === v ? 'rgba(255,255,255,0.25)' : 'transparent' }}
                 onClick={() => { setVista(v); setMostrarFormulario(false) }}
               >
-                {v === 'dashboard' ? 'Dashboard' : 'Productos'}
+                {v === 'dashboard' ? 'Dashboard' : v === 'productos' ? 'Productos' : 'Pagos'}
               </button>
             ))}
           </div>
@@ -159,7 +171,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
           </button>
         </div>
 
-        {/* ── Contenido ── */}
+        {/* Contenido */}
         <div className="col-12 col-md-9 col-lg-10 p-3 p-lg-4 bg-light">
 
           {/* DASHBOARD */}
@@ -216,8 +228,6 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                   </button>
                 )}
               </div>
-
-              {/* ── Formulario crear / editar ── */}
               {mostrarFormulario && (
                 <div className="card border-0 shadow-sm mb-4">
                   <div className="card-body">
@@ -282,15 +292,11 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                       <button className="btn btn-warning fw-bold" onClick={guardar}>
                         {editandoId ? 'Guardar cambios' : 'Crear producto'}
                       </button>
-                      <button className="btn btn-outline-secondary" onClick={cancelar}>
-                        Cancelar
-                      </button>
+                      <button className="btn btn-outline-secondary" onClick={cancelar}>Cancelar</button>
                     </div>
                   </div>
                 </div>
               )}
-
-              {/* ── Buscador ── */}
               <input
                 className="form-control mb-3"
                 placeholder="Buscar por nombre o categoría..."
@@ -298,20 +304,13 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                 onChange={(e) => setBusqueda(e.target.value)}
                 data-testid="buscador-admin"
               />
-
-              {/* ── Tabla de productos ── */}
               <div className="card border-0 shadow-sm">
                 <div className="table-responsive">
                   <table className="table table-hover mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th>ID</th>
-                        <th>Imagen</th>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Acciones</th>
+                        <th>ID</th><th>Imagen</th><th>Nombre</th>
+                        <th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -324,8 +323,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                           <td>
                             {p.imagen
                               ? <img src={p.imagen} alt={p.nombre} style={{ height: 40, objectFit: 'contain' }} />
-                              : <span className="text-muted small">—</span>
-                            }
+                              : <span className="text-muted small">—</span>}
                           </td>
                           <td>{p.nombre}</td>
                           <td>{p.categoria}</td>
@@ -333,10 +331,8 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                           <td>{p.stock}</td>
                           <td>
                             <div className="d-flex gap-1">
-                              <button className="btn btn-sm btn-outline-primary"
-                                onClick={() => abrirEditar(p)}>Editar</button>
-                              <button className="btn btn-sm btn-outline-danger"
-                                onClick={() => eliminar(p.id)}>Eliminar</button>
+                              <button className="btn btn-sm btn-outline-primary" onClick={() => abrirEditar(p)}>Editar</button>
+                              <button className="btn btn-sm btn-outline-danger" onClick={() => eliminar(p.id)}>Eliminar</button>
                             </div>
                           </td>
                         </tr>
@@ -347,6 +343,53 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
               </div>
             </>
           )}
+
+          {/* PAGOS */}
+          {vista === 'pagos' && (
+            <>
+              <div className="mb-4">
+                <h1 className="mb-0">Registro de Pagos</h1>
+                <p className="text-muted">Historial de todos los pagos realizados</p>
+              </div>
+              {cargandoPagos && <p className="text-muted">Cargando pagos...</p>}
+              {errorPagos && <p className="text-danger">{errorPagos}</p>}
+              {!cargandoPagos && !errorPagos && (
+                <div className="card border-0 shadow-sm">
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                      <thead className="table-light">
+                        <tr>
+                          <th>ID</th><th>Cliente</th><th>Correo</th>
+                          <th>Total</th><th>Tarjeta</th><th>Estado</th><th>Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pagos.length === 0 && (
+                          <tr><td colSpan={7} className="text-center text-muted py-3">Sin pagos registrados</td></tr>
+                        )}
+                        {pagos.map((p) => (
+                          <tr key={p.id}>
+                            <td><small className="text-muted">{p.id}</small></td>
+                            <td>{p.nombreCliente}</td>
+                            <td>{p.correoCliente}</td>
+                            <td>${p.total.toLocaleString('es-CL')}</td>
+                            <td>••••{p.ultimosDigitos}</td>
+                            <td>
+                              <span className="badge" style={{ backgroundColor: '#f97316' }}>
+                                {p.estado}
+                              </span>
+                            </td>
+                            <td><small>{new Date(p.fechaPago).toLocaleString('es-CL')}</small></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
         </div>
       </div>
     </div>
