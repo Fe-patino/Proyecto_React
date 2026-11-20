@@ -9,7 +9,7 @@ import type { Producto } from "./Productos"
 import FormularioPago from "../componentes/organismos/FormularioPago"
 
 export interface ItemCarrito {
-  id: string;
+  id: number;
   cantidad: number;
 }
 

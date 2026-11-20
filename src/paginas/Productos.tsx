@@ -1,7 +1,7 @@
 import CatalogoProductos from "../componentes/organismos/CatalogoProductos"
 
 export interface Producto {
-  id: string;
+  id: number;
   nombre: string;
   categoria: string;
   precio: number;
