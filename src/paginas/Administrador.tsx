@@ -64,7 +64,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
   const [productos, setProductos] = useState<Producto[]>([])
   const [busqueda, setBusqueda] = useState('')
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
-  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [editandoId, setEditandoId] = useState<number | null>(null)
   const [form, setForm] = useState<Omit<Producto, 'id'>>(VACÍO)
   const [error, setError] = useState('')
 
