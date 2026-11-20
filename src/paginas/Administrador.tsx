@@ -121,16 +121,22 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
     if (form.precio <= 0)    { setError('El precio debe ser mayor a 0'); return }
     if (form.stock < 0)      { setError('El stock no puede ser negativo'); return }
     if (editandoId) {
-      actualizarProducto(editandoId, form).then(setProductos)
+      actualizarProducto(editandoId, form)
+        .then(setProductos)
+        .catch(() => setError('Error al actualizar el producto'))
     } else {
-      agregarProducto(form).then(setProductos)
+      agregarProducto(form)
+        .then(setProductos)
+        .catch(() => setError('Error al crear el producto'))
     }
     cancelar()
   }
 
-  const eliminar = (id: string) => {
+  const eliminar = (id: number) => {
     if (window.confirm('¿Eliminar este producto?')) {
-      eliminarProducto(id).then(setProductos)
+      eliminarProducto(id)
+        .then(setProductos)
+        .catch(() => alert('Error al eliminar el producto'))
     }
   }
 
