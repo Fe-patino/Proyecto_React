@@ -23,13 +23,14 @@ function App() {
 
   // Quién inició sesión (null si nadie); se recupera al recargar la página
   const [sesion, setSesion] = useState<Sesion | null>(leerSesion)
-  const esAdmin = sesion?.tipo === 'administrador'
+  const esAdmin = sesion?.tipo?.toUpperCase() === 'ADMINISTRADOR'
 
   const iniciarSesion = (tipo: string, correo: string) => {
-    const nueva = crearSesion(tipo, correo)
-    setSesion(nueva)
-    guardarSesionLocal(nueva)
+  const sesionGuardada = leerSesion()
+  if (sesionGuardada) {
+    setSesion(sesionGuardada)
   }
+}
 
   const quitarSesion = () => {
     setSesion(null)
