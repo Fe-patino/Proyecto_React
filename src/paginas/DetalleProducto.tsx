@@ -1,13 +1,18 @@
 import { useParams } from "react-router-dom"
+import { useState, useEffect } from "react"
 import BotonVolver from "../componentes/atomos/BotonVolver"
 import { obtenerProductoPorId } from "../productosService"
+import type { Producto } from "./Productos"
 
 const formatearPrecio = (valor: number) => "$" + valor.toLocaleString("es-CL")
 
-// Página /producto/:id — el id llega por la URL (parámetro de ruta)
 function DetalleProducto() {
     const { id } = useParams()
-    const producto = id ? obtenerProductoPorId(id) : undefined
+    const [producto, setProducto] = useState<Producto | undefined>(undefined)
+
+    useEffect(() => {
+        if (id) obtenerProductoPorId(id).then(setProducto)
+    }, [id])
 
     if (!producto) {
         return (

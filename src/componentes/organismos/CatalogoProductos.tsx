@@ -8,11 +8,15 @@ import { useCarrito } from "../../useCarrito"
 
 // Organismo: arma el catálogo completo (filtros + buscador + lista) y maneja su estado
 function CatalogoProductos() {
-    const [productos] = useState(obtenerProductos)
+    const [productos, setProductos] = useState<any[]>([])
     const [categoria, setCategoria] = useState("Todos")
     const [texto, setTexto] = useState("")
     const [aviso, setAviso] = useState({ texto: "", tipo: "success" })
     const { agregar } = useCarrito()
+
+    useEffect(() => {
+        obtenerProductos().then(setProductos)
+    }, [])
 
     // El aviso de "producto agregado" desaparece solo a los 2 segundos
     useEffect(() => {
@@ -23,7 +27,6 @@ function CatalogoProductos() {
 
     const alAgregar = (id: string) => {
         const nombre = productos.find((p) => p.id === id)?.nombre ?? "Producto"
-        // agregar() devuelve false si ya no quedan unidades disponibles
         if (agregar(id)) {
             setAviso({ texto: `${nombre} agregado al carrito.`, tipo: "success" })
         } else {

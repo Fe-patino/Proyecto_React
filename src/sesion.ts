@@ -24,3 +24,8 @@ export function guardarSesionLocal(sesion: Sesion | null) {
     else localStorage.removeItem(CLAVE_SESION)
   } catch {}
 }
+export function crearSesion(tipo: string, correo: string, nombre: string, token: string): Sesion {
+  const sesion: Sesion = { tipo, correo, nombre, token }
+  guardarSesionLocal(sesion)
+  return sesion
+}

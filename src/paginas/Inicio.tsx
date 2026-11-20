@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import Hero from "../componentes/organismos/Hero"
 import ListaProductos from "../componentes/organismos/ListaProductos"
@@ -18,8 +19,11 @@ const BENEFICIOS = [
 
 // Página / (inicio): portada con carrusel, productos destacados y beneficios
 function Inicio() {
-    // Los destacados son los 3 primeros productos del catálogo
-    const destacados = obtenerProductos().slice(0, 3)
+    const [destacados, setDestacados] = useState<any[]>([])
+
+    useEffect(() => {
+        obtenerProductos().then(productos => setDestacados(productos.slice(0, 3)))
+    }, [])
 
     return (
         <>
@@ -57,4 +61,5 @@ function Inicio() {
         </>
     )
 }
+
 export default Inicio

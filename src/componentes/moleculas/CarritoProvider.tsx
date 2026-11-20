@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { CarritoContexto } from "./CarritoContexto";
-import { obtenerProductoPorId } from "../../productosService";
+import { obtenerProductos } from "../../productosService";
 import type { ItemCarrito } from "../../paginas/Carrito";
+import type { Producto } from "../../paginas/Productos";
 
 export const CLAVE_STORAGE = "gasElVolcan_carrito";
 
-// Lee el carrito guardado en LocalStorage; si no hay nada o está dañado, parte vacío
 function leerCarritoGuardado(): ItemCarrito[] {
   try {
     const datos = JSON.parse(localStorage.getItem(CLAVE_STORAGE) ?? "[]");
@@ -19,16 +19,22 @@ function leerCarritoGuardado(): ItemCarrito[] {
   }
 }
 
-const stockDe = (id: string) => obtenerProductoPorId(id)?.stock ?? 0;
-
 interface CarritoProviderProps {
   children: ReactNode;
 }
 
-// Guarda el estado del carrito con useState y lo comparte con toda la aplicación.
-// Se guarda también en LocalStorage para que no se pierda al recargar la página.
 function CarritoProvider({ children }: CarritoProviderProps) {
   const [items, setItems] = useState<ItemCarrito[]>(leerCarritoGuardado);
+  const [productos, setProductos] = useState<Producto[]>([]);
+
+  useEffect(() => {
+    obtenerProductos().then(setProductos)
+  }, [])
+
+  const stockDe = (id: string): number => {
+    const p = productos.find((p) => String(p.id) === String(id));
+    return p?.stock ?? 0;
+  }
 
   const actualizar = (nuevos: ItemCarrito[]) => {
     setItems(nuevos);
@@ -38,7 +44,7 @@ function CarritoProvider({ children }: CarritoProviderProps) {
   const agregar = (id: string): boolean => {
     const existente = items.find((i) => i.id === id);
     const actual = existente?.cantidad ?? 0;
-    if (actual >= stockDe(id)) return false; // sin stock o ya llegó al máximo
+    if (actual >= stockDe(id)) return false;
 
     actualizar(
       existente
@@ -50,7 +56,6 @@ function CarritoProvider({ children }: CarritoProviderProps) {
 
   const quitar = (id: string) => actualizar(items.filter((i) => i.id !== id));
 
-  // La cantidad siempre queda entre 1 y el stock disponible
   const cambiarCantidad = (id: string, cantidad: number) => {
     const entera = Number.isNaN(cantidad) ? 1 : Math.floor(cantidad);
     const maximo = Math.max(stockDe(id), 1);

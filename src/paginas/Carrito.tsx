@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import TablaCarrito from "../componentes/organismos/TablaCarrito"
 import ResumenCarrito from "../componentes/moleculas/ResumenCarrito"
@@ -22,8 +22,13 @@ function Carrito() {
   const { items, cambiarCantidad, quitar, vaciar } = useCarrito()
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false)
   const [mostrarPago, setMostrarPago] = useState(false)
+  const [productos, setProductos] = useState<Producto[]>([])
 
-  const lineas = armarLineas(items, obtenerProductos())
+  useEffect(() => {
+    obtenerProductos().then(setProductos)
+  }, [])
+
+  const lineas = armarLineas(items, productos)
   const total = calcularTotal(lineas)
 
   const alPagarExitoso = () => {
