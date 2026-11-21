@@ -3,8 +3,8 @@ import type { LineaCarrito } from "../../paginas/Carrito";
 
 interface FilaCarritoProps {
     linea: LineaCarrito;
-    alCambiarCantidad: (id: string, cantidad: number) => void;
-    alQuitar: (id: string) => void;
+    alCambiarCantidad: (id: number, cantidad: number) => void;
+    alQuitar: (id: number) => void;
 }
 
 // Molécula: una fila de la tabla del carrito (producto, precio, cantidad con − / +, subtotal, quitar)
