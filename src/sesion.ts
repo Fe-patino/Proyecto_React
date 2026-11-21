@@ -29,3 +29,10 @@ export function crearSesion(tipo: string, correo: string, nombre: string, token:
   guardarSesionLocal(sesion)
   return sesion
 }
+
+// Cabecera Authorization con el JWT de la sesión activa ({} si nadie ha iniciado sesión).
+// Los microservicios de contacto y pagos la exigen en sus endpoints protegidos.
+export function encabezadoAutorizacion(): Record<string, string> {
+  const token = leerSesion()?.token
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
