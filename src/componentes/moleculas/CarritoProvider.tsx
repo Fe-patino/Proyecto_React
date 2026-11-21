@@ -11,9 +11,10 @@ function leerCarritoGuardado(): ItemCarrito[] {
   try {
     const datos = JSON.parse(localStorage.getItem(CLAVE_STORAGE) ?? "[]");
     if (!Array.isArray(datos)) return [];
-    return datos.filter(
-      (i): i is ItemCarrito => typeof i?.id === "string" && Number.isInteger(i?.cantidad) && i.cantidad >= 1,
-    );
+    // Los ids son numéricos (vienen de la base de datos); se acepta también un id guardado como texto numérico
+    return datos
+      .map((i) => ({ id: Number(i?.id), cantidad: i?.cantidad }))
+      .filter((i): i is ItemCarrito => Number.isInteger(i.id) && Number.isInteger(i.cantidad) && i.cantidad >= 1);
   } catch {
     return [];
   }
@@ -28,11 +29,11 @@ function CarritoProvider({ children }: CarritoProviderProps) {
   const [productos, setProductos] = useState<Producto[]>([]);
 
   useEffect(() => {
-    obtenerProductos().then(setProductos)
+    obtenerProductos().then(setProductos).catch(() => setProductos([]))
   }, [])
 
-  const stockDe = (id: string): number => {
-    const p = productos.find((p) => String(p.id) === String(id));
+  const stockDe = (id: number): number => {
+    const p = productos.find((p) => p.id === id);
     return p?.stock ?? 0;
   }
 
@@ -41,7 +42,7 @@ function CarritoProvider({ children }: CarritoProviderProps) {
     localStorage.setItem(CLAVE_STORAGE, JSON.stringify(nuevos));
   };
 
-  const agregar = (id: string): boolean => {
+  const agregar = (id: number): boolean => {
     const existente = items.find((i) => i.id === id);
     const actual = existente?.cantidad ?? 0;
     if (actual >= stockDe(id)) return false;
@@ -54,9 +55,9 @@ function CarritoProvider({ children }: CarritoProviderProps) {
     return true;
   };
 
-  const quitar = (id: string) => actualizar(items.filter((i) => i.id !== id));
+  const quitar = (id: number) => actualizar(items.filter((i) => i.id !== id));
 
-  const cambiarCantidad = (id: string, cantidad: number) => {
+  const cambiarCantidad = (id: number, cantidad: number) => {
     const entera = Number.isNaN(cantidad) ? 1 : Math.floor(cantidad);
     const maximo = Math.max(stockDe(id), 1);
     const valida = Math.min(Math.max(entera, 1), maximo);
