@@ -6,8 +6,8 @@ export interface FiltroProductos {
 }
 
 // Quita tildes y pasa a minúsculas para que "domestico" encuentre "doméstico"
-const normalizar = (t: string) =>
-  t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+const normalizar = (t: string | null | undefined) =>
+  (t ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 // Función pura: recibe la lista y el filtro y devuelve la lista filtrada
 export function filtrarProductos(productos: Producto[], filtro: FiltroProductos): Producto[] {
@@ -17,7 +17,7 @@ export function filtrarProductos(productos: Producto[], filtro: FiltroProductos)
     const coincideTexto =
       texto === "" ||
       normalizar(p.nombre).includes(texto) ||
-      normalizar(p.id).includes(texto) ||
+      normalizar(String(p.id)).includes(texto) ||
       normalizar(p.descripcionBreve).includes(texto);
     return coincideCategoria && coincideTexto;
   });
