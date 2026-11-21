@@ -9,7 +9,9 @@ import {
 } from '../productosService'
 import type { Producto } from './Productos'
 
-import { encabezadoAutorizacion } from '../sesion'
+import { encabezadoAutorizacion, leerSesion } from '../sesion'
+import { obtenerUsuarios, crearUsuario, eliminarUsuario } from '../usuariosService'
+import type { Usuario, RolUsuario } from '../usuariosService'
 import {
   obtenerMensajes,
   cambiarEstadoMensaje,
@@ -21,7 +23,7 @@ interface AdministradorProps {
   alCerrarSesion: () => void
 }
 
-type Vista = 'dashboard' | 'productos' | 'pagos' | 'mensajes'
+type Vista = 'dashboard' | 'productos' | 'pagos' | 'mensajes' | 'usuarios'
 
 type FiltroMensajes = 'TODOS' | 'PENDIENTE' | 'RESPONDIDO'
 
@@ -92,6 +94,15 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
   const [errorMensajes, setErrorMensajes] = useState('')
   const [filtroMensajes, setFiltroMensajes] = useState<FiltroMensajes>('TODOS')
 
+  // Estado para usuarios (crear clientes y administradores)
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [cargandoUsuarios, setCargandoUsuarios] = useState(false)
+  const [errorUsuarios, setErrorUsuarios] = useState('')
+  const [formUsuario, setFormUsuario] = useState<{ nombre: string; correo: string; password: string; rol: RolUsuario }>(
+    { nombre: '', correo: '', password: '', rol: 'CLIENTE' },
+  )
+  const [errorFormUsuario, setErrorFormUsuario] = useState('')
+
   // Cargar productos desde ms-productos al montar el componente
   useEffect(() => {
     obtenerProductos().then(setProductos).catch(() => setProductos([]))
@@ -133,6 +144,41 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
     }
   }, [vista])
 
+  // Usuarios: se cargan al abrir la vista
+  const cargarUsuarios = () => {
+    setCargandoUsuarios(true)
+    obtenerUsuarios()
+      .then((datos) => { setUsuarios(datos); setErrorUsuarios('') })
+      .catch((e: Error) => setErrorUsuarios(e.message || 'No se pudieron cargar los usuarios.'))
+      .finally(() => setCargandoUsuarios(false))
+  }
+
+  useEffect(() => {
+    if (vista === 'usuarios') cargarUsuarios()
+  }, [vista])
+
+  const guardarUsuario = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const { nombre, correo, password } = formUsuario
+    if (nombre.trim().length < 3) { setErrorFormUsuario('El nombre debe tener al menos 3 caracteres'); return }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { setErrorFormUsuario('Ingrese un correo válido'); return }
+    if (password.length < 4 || password.length > 20) { setErrorFormUsuario('La contraseña debe tener entre 4 y 20 caracteres'); return }
+    setErrorFormUsuario('')
+    crearUsuario(formUsuario)
+      .then(() => {
+        setFormUsuario({ nombre: '', correo: '', password: '', rol: 'CLIENTE' })
+        cargarUsuarios()
+      })
+      .catch((err: Error) => setErrorFormUsuario(err.message))
+  }
+
+  const borrarUsuario = (u: Usuario) => {
+    if (!window.confirm(`¿Eliminar al usuario ${u.nombre} (${u.correo})?`)) return
+    eliminarUsuario(u.id)
+      .then(cargarUsuarios)
+      .catch((err: Error) => alert(err.message))
+  }
+  
   const cerrarSesion = () => {
     alCerrarSesion()
     navegar('/login')
@@ -206,7 +252,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
         >
           <h5 className="text-white fw-bold mb-4">Administración</h5>
           <div className="d-flex flex-md-column flex-wrap gap-1">
-            {(['dashboard', 'productos', 'pagos', 'mensajes'] as Vista[]).map((v) => (
+            {(['dashboard', 'productos', 'pagos', 'mensajes', 'usuarios'] as Vista[]).map((v) => (
               <button
                 key={v}
                 type="button"
@@ -214,7 +260,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                 style={{ background: vista === v ? 'rgba(255,255,255,0.25)' : 'transparent' }}
                 onClick={() => { setVista(v); setMostrarFormulario(false) }}
               >
-                {v === 'dashboard' ? 'Dashboard' : v === 'productos' ? 'Productos' : v === 'pagos' ? 'Pagos' : 'Mensajes'}
+                {v === 'dashboard' ? 'Dashboard' : v === 'productos' ? 'Productos' : v === 'pagos' ? 'Pagos' : v === 'mensajes' ? 'Mensajes' : 'Usuarios'}
                 {v === 'mensajes' && pendientes > 0 && (
                   <span className="badge bg-light ms-2" style={{ color: '#ea580c' }} data-testid="contador-mensajes">
                     {pendientes}
@@ -468,6 +514,110 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                               >
                                 {m.estado === 'PENDIENTE' ? 'Marcar respondido' : 'Marcar pendiente'}
                               </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* USUARIOS */}
+          {vista === 'usuarios' && (
+            <>
+              <div className="mb-3">
+                <h1 className="mb-0">Usuarios</h1>
+                <p className="text-muted mb-0">Crea cuentas de cliente o de administrador</p>
+              </div>
+
+              <form className="card border-0 shadow-sm mb-4" onSubmit={guardarUsuario} data-testid="form-usuario">
+                <div className="card-body">
+                  <div className="row g-3">
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" htmlFor="usuario-nombre">Nombre completo</label>
+                      <input
+                        id="usuario-nombre"
+                        className="form-control"
+                        value={formUsuario.nombre}
+                        onChange={(e) => setFormUsuario({ ...formUsuario, nombre: e.target.value })}
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" htmlFor="usuario-correo">Correo electrónico</label>
+                      <input
+                        id="usuario-correo"
+                        type="email"
+                        className="form-control"
+                        value={formUsuario.correo}
+                        onChange={(e) => setFormUsuario({ ...formUsuario, correo: e.target.value })}
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" htmlFor="usuario-password">Contraseña (4 a 20 caracteres)</label>
+                      <input
+                        id="usuario-password"
+                        type="password"
+                        className="form-control"
+                        value={formUsuario.password}
+                        onChange={(e) => setFormUsuario({ ...formUsuario, password: e.target.value })}
+                      />
+                    </div>
+                    <div className="col-12 col-md-6">
+                      <label className="form-label" htmlFor="usuario-rol">Tipo de usuario</label>
+                      <select
+                        id="usuario-rol"
+                        className="form-select"
+                        value={formUsuario.rol}
+                        onChange={(e) => setFormUsuario({ ...formUsuario, rol: e.target.value as RolUsuario })}
+                      >
+                        <option value="CLIENTE">Cliente</option>
+                        <option value="ADMINISTRADOR">Administrador</option>
+                      </select>
+                    </div>
+                  </div>
+                  {errorFormUsuario && <p className="text-danger mt-3 mb-0">{errorFormUsuario}</p>}
+                  <button type="submit" className="btn btn-warning fw-bold mt-3">Crear usuario</button>
+                </div>
+              </form>
+
+              {cargandoUsuarios && <p className="text-muted">Cargando usuarios...</p>}
+              {errorUsuarios && <p className="text-danger">{errorUsuarios}</p>}
+              {!cargandoUsuarios && !errorUsuarios && (
+                <div className="card border-0 shadow-sm">
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0 align-middle">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Nombre</th><th>Correo</th><th>Tipo</th><th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody data-testid="tabla-usuarios">
+                        {usuarios.length === 0 && (
+                          <tr><td colSpan={4} className="text-center text-muted py-3">Sin usuarios</td></tr>
+                        )}
+                        {usuarios.map((u) => (
+                          <tr key={u.id}>
+                            <td>{u.nombre}</td>
+                            <td>{u.correo}</td>
+                            <td>
+                              <span
+                                className="badge"
+                                style={{ backgroundColor: u.rol === 'ADMINISTRADOR' ? '#ea580c' : '#6c757d' }}
+                              >
+                                {u.rol === 'ADMINISTRADOR' ? 'Administrador' : 'Cliente'}
+                              </span>
+                            </td>
+                            <td>
+                              {u.correo === leerSesion()?.correo ? (
+                                <small className="text-muted">Tu cuenta</small>
+                              ) : (
+                                <button className="btn btn-sm btn-outline-danger" onClick={() => borrarUsuario(u)}>
+                                  Eliminar
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}
