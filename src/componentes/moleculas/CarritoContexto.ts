@@ -5,9 +5,9 @@ export interface CarritoContextoValor {
   items: ItemCarrito[];
   totalUnidades: number;
   // Devuelve false si no se pudo agregar (sin stock o ya está el máximo)
-  agregar: (id: string) => boolean;
-  quitar: (id: string) => void;
-  cambiarCantidad: (id: string, cantidad: number) => void;
+  agregar: (id: number) => boolean;
+  quitar: (id: number) => void;
+  cambiarCantidad: (id: number, cantidad: number) => void;
   vaciar: () => void;
 }
 
