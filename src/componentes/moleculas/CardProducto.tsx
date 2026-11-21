@@ -4,7 +4,7 @@ import Boton from "../atomos/Boton"
 
 interface CardProductoProps {
     producto: Producto;
-    alAgregar?: (id: string) => void;
+    alAgregar?: (id: number) => void;
 }
 
 const formatearPrecio = (valor: number) => "$" + valor.toLocaleString("es-CL")
