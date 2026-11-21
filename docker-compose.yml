@@ -1,0 +1,10 @@
+# Solo el frontend. Para levantar TODO el proyecto (MySQL + microservicios + frontend)
+# usa el docker-compose.yml del repositorio de microservicios:  docker compose --profile full up --build
+services:
+  frontend:
+    build: .
+    container_name: gv-frontend
+    restart: unless-stopped
+    ports:
+      # 5173 porque los microservicios solo aceptan CORS desde http://localhost:5173
+      - "5173:80"
