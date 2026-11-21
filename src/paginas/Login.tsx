@@ -73,11 +73,10 @@ function Login({ alIngresar }: LoginProps) {
     if (confirmar !== contrasena) { alert('Las contraseñas no coinciden'); return }
     setCargando(true)
     try {
-      const rolBackend = tipo === 'administrador' ? 'ADMINISTRADOR' : 'CLIENTE'
       const res = await fetch('http://localhost:8082/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, correo, password: contrasena, rol: rolBackend }),
+        body: JSON.stringify({ nombre, correo, password: contrasena }),
       })
       if (!res.ok) { alert('El correo ya está registrado'); return }
       alert('Registro realizado correctamente. Ahora inicia sesión.')
