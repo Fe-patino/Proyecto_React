@@ -49,7 +49,7 @@ export async function agregarProducto(datos: Omit<Producto, "id">): Promise<Prod
 }
 
 // PUT /api/productos/{id} — Actualiza un producto existente (requiere token de administrador)
-export async function actualizarProducto(id: string, cambios: Partial<Omit<Producto, "id">>): Promise<Producto[]> {
+export async function actualizarProducto(id: number, cambios: Partial<Omit<Producto, "id">>): Promise<Producto[]> {
   await fetch(`${URL_BASE}/${id}`, {
     method: "PUT",
     headers: {
@@ -62,7 +62,7 @@ export async function actualizarProducto(id: string, cambios: Partial<Omit<Produ
 }
 
 // DELETE /api/productos/{id} — Elimina un producto por ID (requiere token de administrador)
-export async function eliminarProducto(id: string): Promise<Producto[]> {
+export async function eliminarProducto(id: number): Promise<Producto[]> {
   await fetch(`${URL_BASE}/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${obtenerToken()}` },
