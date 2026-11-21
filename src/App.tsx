@@ -13,7 +13,7 @@ import Login from './paginas/Login'
 import Administrador from './paginas/Administrador'
 import Novedades from './paginas/Novedades'
 import MiCuenta from './paginas/MiCuenta'
-import { crearSesion, guardarSesionLocal, leerSesion } from './sesion'
+import { guardarSesionLocal, leerSesion } from './sesion'
 import type { Sesion } from './sesion'
 
 function App() {
@@ -25,7 +25,8 @@ function App() {
   const [sesion, setSesion] = useState<Sesion | null>(leerSesion)
   const esAdmin = sesion?.tipo?.toUpperCase() === 'ADMINISTRADOR'
 
-  const iniciarSesion = (tipo: string, correo: string) => {
+  // Login ya guardó la sesión (token incluido); aquí solo se vuelve a leer para actualizar el estado
+  const iniciarSesion = () => {
   const sesionGuardada = leerSesion()
   if (sesionGuardada) {
     setSesion(sesionGuardada)
