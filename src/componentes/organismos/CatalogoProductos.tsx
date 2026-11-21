@@ -25,7 +25,7 @@ function CatalogoProductos() {
         return () => clearTimeout(temporizador)
     }, [aviso])
 
-    const alAgregar = (id: string) => {
+    const alAgregar = (id: number) => {
         const nombre = productos.find((p) => p.id === id)?.nombre ?? "Producto"
         if (agregar(id)) {
             setAviso({ texto: `${nombre} agregado al carrito.`, tipo: "success" })
