@@ -3,7 +3,7 @@ import CardProducto from "../moleculas/CardProducto"
 
 interface ListaProductosProps {
     productos: Producto[];
-    alAgregar?: (id: string) => void;
+    alAgregar?: (id: number) => void;
     mensajeVacio?: string;
 }
 
