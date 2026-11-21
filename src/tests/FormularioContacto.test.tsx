@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { test, expect, vi, afterEach } from "vitest";
-import { fireEvent, render, screen, cleanup } from "@testing-library/react";
+import { fireEvent, render, screen, cleanup, waitFor } from "@testing-library/react";
 import FormularioContacto from "../componentes/organismos/FormularioContacto";
 
 // Limpia el DOM después de cada test para evitar componentes duplicados
@@ -71,8 +71,10 @@ test("4. Muestra una alerta cuando el mensaje está vacío", () => {
   alerta.mockRestore();
 });
 
-test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son válidos", () => {
+test("5. Envía el mensaje al backend, muestra alerta de éxito y limpia el formulario", async () => {
   const alerta = vi.spyOn(window, "alert").mockImplementation(() => {});
+  const fetchFalso = vi.fn(async () => ({ ok: true, json: async () => ({}) }) as Response);
+  vi.stubGlobal("fetch", fetchFalso);
 
   render(<FormularioContacto />);
 
@@ -84,11 +86,23 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
   fireEvent.change(campoCorreo, { target: { value: "juan@example.com" } });
   fireEvent.change(campoMensaje, { target: { value: "Hola, solicito recarga de gas" } });
 
-  const botonEnviar = screen.getByTestId("boton-enviar");
-  fireEvent.click(botonEnviar);
+  fireEvent.click(screen.getByTestId("boton-enviar"));
 
-  expect(alerta).toHaveBeenCalledWith(
-    expect.stringContaining("¡Formulario enviado correctamente!")
+  await waitFor(() =>
+    expect(alerta).toHaveBeenCalledWith(expect.stringContaining("¡Mensaje enviado correctamente!"))
+  );
+
+  // El mensaje viaja a ms-contacto con los campos que espera el backend
+  expect(fetchFalso).toHaveBeenCalledWith(
+    "http://localhost:8083/api/contactos",
+    expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({
+        nombreCompleto: "Juan Pérez",
+        correo: "juan@example.com",
+        mensaje: "Hola, solicito recarga de gas",
+      }),
+    })
   );
 
   // Verificación de reseteo
@@ -97,4 +111,5 @@ test("5. Muestra alerta de éxito y limpia el formulario cuando los datos son v�
   expect(campoMensaje.value).toBe("");
 
   alerta.mockRestore();
+  vi.unstubAllGlobals();
 });
