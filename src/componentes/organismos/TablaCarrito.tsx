@@ -3,8 +3,8 @@ import FilaCarrito from "../moleculas/FilaCarrito";
 
 interface TablaCarritoProps {
     lineas: LineaCarrito[];
-    alCambiarCantidad: (id: string, cantidad: number) => void;
-    alQuitar: (id: string) => void;
+    alCambiarCantidad: (id: number, cantidad: number) => void;
+    alQuitar: (id: number) => void;
 }
 
 // Organismo: tabla responsive con una fila por cada producto del carrito
