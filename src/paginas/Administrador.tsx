@@ -9,11 +9,24 @@ import {
 } from '../productosService'
 import type { Producto } from './Productos'
 
+import { encabezadoAutorizacion } from '../sesion'
+import {
+  obtenerMensajes,
+  cambiarEstadoMensaje,
+  contarPendientes,
+} from '../contactoService'
+import type { MensajeContacto } from '../contactoService'
+
 interface AdministradorProps {
   alCerrarSesion: () => void
 }
 
-type Vista = 'dashboard' | 'productos' | 'pagos'
+type Vista = 'dashboard' | 'productos' | 'pagos' | 'mensajes'
+
+type FiltroMensajes = 'TODOS' | 'PENDIENTE' | 'RESPONDIDO'
+
+// Cada cuántos milisegundos se revisan los mensajes nuevos mientras el panel está abierto
+const INTERVALO_MENSAJES = 15000
 
 interface Pago {
   id: number
@@ -73,15 +86,46 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
   const [cargandoPagos, setCargandoPagos] = useState(false)
   const [errorPagos, setErrorPagos] = useState('')
 
+  // Estado para mensajes de contacto
+  const [mensajes, setMensajes] = useState<MensajeContacto[]>([])
+  const [cargandoMensajes, setCargandoMensajes] = useState(true)
+  const [errorMensajes, setErrorMensajes] = useState('')
+  const [filtroMensajes, setFiltroMensajes] = useState<FiltroMensajes>('TODOS')
+
   // Cargar productos desde ms-productos al montar el componente
   useEffect(() => {
-    obtenerProductos().then(setProductos)
+    obtenerProductos().then(setProductos).catch(() => setProductos([]))
   }, [])
+
+  // Mensajes de contacto: se cargan al abrir el panel y se revisan cada pocos segundos,
+  // así al administrador le llegan los mensajes nuevos sin recargar la página
+  const cargarMensajes = () => {
+    obtenerMensajes()
+      .then((datos) => { setMensajes(datos); setErrorMensajes('') })
+      .catch(() => setErrorMensajes('No se pudieron cargar los mensajes. Verifica que ms-contacto esté corriendo.'))
+      .finally(() => setCargandoMensajes(false))
+  }
+
+  useEffect(() => {
+    cargarMensajes()
+    const temporizador = setInterval(cargarMensajes, INTERVALO_MENSAJES)
+    return () => clearInterval(temporizador)
+  }, [])
+
+  const alternarEstadoMensaje = (m: MensajeContacto) => {
+    const nuevo = m.estado === 'PENDIENTE' ? 'RESPONDIDO' : 'PENDIENTE'
+    cambiarEstadoMensaje(m.id, nuevo)
+      .then((actualizado) => setMensajes((prev) => prev.map((x) => (x.id === actualizado.id ? actualizado : x))))
+      .catch(() => alert('No se pudo cambiar el estado del mensaje'))
+  }
+
+  const pendientes = contarPendientes(mensajes)
+  const mensajesFiltrados = mensajes.filter((m) => filtroMensajes === 'TODOS' || m.estado === filtroMensajes)
 
   useEffect(() => {
     if (vista === 'pagos') {
       setCargandoPagos(true)
-      fetch('http://localhost:8085/api/pagos')
+      fetch('http://localhost:8085/api/pagos', { headers: encabezadoAutorizacion() })
         .then((res) => { if (!res.ok) throw new Error(); return res.json() })
         .then((datos) => setPagos(datos))
         .catch(() => setErrorPagos('No se pudieron cargar los pagos.'))
@@ -144,6 +188,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
     { titulo: 'Productos', valor: String(productos.length), detalle: 'en el catálogo' },
     { titulo: 'Categorías', valor: String(CATEGORIAS.length), detalle: 'disponibles' },
     { titulo: 'Stock total', valor: String(productos.reduce((s, p) => s + p.stock, 0)), detalle: 'unidades' },
+    { titulo: 'Mensajes pendientes', valor: String(pendientes), detalle: 'por responder' },
   ]
 
   const fecha = new Date().toLocaleDateString('es-CL', {
@@ -161,7 +206,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
         >
           <h5 className="text-white fw-bold mb-4">Administración</h5>
           <div className="d-flex flex-md-column flex-wrap gap-1">
-            {(['dashboard', 'productos', 'pagos'] as Vista[]).map((v) => (
+            {(['dashboard', 'productos', 'pagos', 'mensajes'] as Vista[]).map((v) => (
               <button
                 key={v}
                 type="button"
@@ -169,7 +214,12 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
                 style={{ background: vista === v ? 'rgba(255,255,255,0.25)' : 'transparent' }}
                 onClick={() => { setVista(v); setMostrarFormulario(false) }}
               >
-                {v === 'dashboard' ? 'Dashboard' : v === 'productos' ? 'Productos' : 'Pagos'}
+                {v === 'dashboard' ? 'Dashboard' : v === 'productos' ? 'Productos' : v === 'pagos' ? 'Pagos' : 'Mensajes'}
+                {v === 'mensajes' && pendientes > 0 && (
+                  <span className="badge bg-light ms-2" style={{ color: '#ea580c' }} data-testid="contador-mensajes">
+                    {pendientes}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -195,7 +245,7 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
               </div>
               <div className="row g-3 mb-4">
                 {resumen.map((r) => (
-                  <div className="col-12 col-md-4" key={r.titulo}>
+                  <div className="col-12 col-md-6 col-lg-3" key={r.titulo}>
                     <div className="card border-0 shadow-sm h-100">
                       <div className="card-body">
                         <p className="text-muted mb-1">{r.titulo}</p>
@@ -356,6 +406,79 @@ function Administrador({ alCerrarSesion }: AdministradorProps) {
             </>
           )}
 
+          {/* MENSAJES DE CONTACTO */}
+          {vista === 'mensajes' && (
+            <>
+              <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div>
+                  <h1 className="mb-0">Mensajes de clientes</h1>
+                  <p className="text-muted mb-0">
+                    Enviados desde el formulario de contacto · {pendientes} pendiente{pendientes === 1 ? '' : 's'}
+                  </p>
+                </div>
+                <button className="btn btn-outline-secondary" onClick={cargarMensajes}>Actualizar</button>
+              </div>
+              <div className="btn-group mb-3" role="group" aria-label="Filtrar mensajes">
+                {(['TODOS', 'PENDIENTE', 'RESPONDIDO'] as FiltroMensajes[]).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    className={'btn btn-sm ' + (filtroMensajes === f ? 'btn-warning fw-bold' : 'btn-outline-secondary')}
+                    onClick={() => setFiltroMensajes(f)}
+                  >
+                    {f === 'TODOS' ? 'Todos' : f === 'PENDIENTE' ? 'Pendientes' : 'Respondidos'}
+                  </button>
+                ))}
+              </div>
+              {cargandoMensajes && <p className="text-muted">Cargando mensajes...</p>}
+              {errorMensajes && <p className="text-danger">{errorMensajes}</p>}
+              {!cargandoMensajes && !errorMensajes && (
+                <div className="card border-0 shadow-sm">
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0 align-middle">
+                      <thead className="table-light">
+                        <tr>
+                          <th>Fecha</th><th>Cliente</th><th>Mensaje</th><th>Estado</th><th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody data-testid="tabla-mensajes">
+                        {mensajesFiltrados.length === 0 && (
+                          <tr><td colSpan={5} className="text-center text-muted py-3">Sin mensajes</td></tr>
+                        )}
+                        {mensajesFiltrados.map((m) => (
+                          <tr key={m.id}>
+                            <td><small>{new Date(m.fechaCreacion).toLocaleString('es-CL')}</small></td>
+                            <td>
+                              <div className="fw-semibold">{m.nombreCompleto}</div>
+                              <a href={'mailto:' + m.correo} className="small">{m.correo}</a>
+                            </td>
+                            <td style={{ whiteSpace: 'pre-wrap', maxWidth: 420 }}>{m.mensaje}</td>
+                            <td>
+                              <span
+                                className="badge"
+                                style={{ backgroundColor: m.estado === 'PENDIENTE' ? '#f97316' : '#198754' }}
+                              >
+                                {m.estado === 'PENDIENTE' ? 'Pendiente' : 'Respondido'}
+                              </span>
+                            </td>
+                            <td>
+                              <button
+                                className={'btn btn-sm ' + (m.estado === 'PENDIENTE' ? 'btn-outline-success' : 'btn-outline-secondary')}
+                                onClick={() => alternarEstadoMensaje(m)}
+                              >
+                                {m.estado === 'PENDIENTE' ? 'Marcar respondido' : 'Marcar pendiente'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          
           {/* PAGOS */}
           {vista === 'pagos' && (
             <>
