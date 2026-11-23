@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { encabezadoAutorizacion, leerSesion } from "../../sesion"
+import { leerSesion } from "../../sesion"
 
 interface Props {
   total: number
@@ -25,7 +25,10 @@ function FormularioPago({ total, alPagarExitoso, alCancelar }: Props) {
     try {
       const res = await fetch("http://localhost:8085/api/pagos", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...encabezadoAutorizacion() },
+        headers: {
+          "Content-Type": "application/json",
+          ...(sesion?.token ? { Authorization: `Bearer ${sesion.token}` } : {}),
+        },
         body: JSON.stringify({
           nombreCliente: nombre,
           correoCliente: correo,
