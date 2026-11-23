@@ -33,14 +33,11 @@ function MiCuenta({ sesion }: MiCuentaProps) {
   useEffect(() => {
     if (seccion === 'pedidos') {
       setCargandoPagos(true)
-      fetch('http://localhost:8085/api/pagos')
+      fetch(`http://localhost:8085/api/pagos/cliente/${encodeURIComponent(sesion.correo)}`, {
+        headers: { Authorization: `Bearer ${sesion.token}` }
+      })
         .then(r => r.json())
-        .then((data: Pago[]) => {
-          const misPagos = data.filter(
-            p => p.correoCliente?.toLowerCase() === sesion.correo?.toLowerCase()
-          )
-          setPagos(misPagos)
-        })
+        .then((data: Pago[]) => setPagos(Array.isArray(data) ? data : []))
         .catch(() => setPagos([]))
         .finally(() => setCargandoPagos(false))
     }
@@ -62,7 +59,6 @@ function MiCuenta({ sesion }: MiCuentaProps) {
   return (
     <div className="container my-5">
       <div className="row">
-        {/* Sidebar */}
         <div className="col-12 col-md-3 mb-4">
           <div className="card border-0 shadow-sm rounded-4 p-3">
             <div className="text-center mb-3">
@@ -102,10 +98,8 @@ function MiCuenta({ sesion }: MiCuentaProps) {
           </div>
         </div>
 
-        {/* Contenido */}
         <div className="col-12 col-md-9">
 
-          {/* PERFIL */}
           {seccion === 'perfil' && (
             <div className="card border-0 shadow-sm rounded-4 p-4">
               <h4 className="fw-bold mb-4">Mi perfil</h4>
@@ -119,7 +113,7 @@ function MiCuenta({ sesion }: MiCuentaProps) {
               </div>
               <div className="mb-4">
                 <p className="text-muted mb-1 small">Tipo de cuenta</p>
-                <p className="fw-semibold fs-5 text-capitalize">
+                <p className="fw-semibold fs-5">
                   {sesion.tipo?.toUpperCase() === 'ADMINISTRADOR' ? 'Administrador' : 'Cliente'}
                 </p>
               </div>
@@ -129,7 +123,6 @@ function MiCuenta({ sesion }: MiCuentaProps) {
             </div>
           )}
 
-          {/* PEDIDOS */}
           {seccion === 'pedidos' && (
             <div className="card border-0 shadow-sm rounded-4 p-4">
               <h4 className="fw-bold mb-4">Mis pedidos</h4>
@@ -168,7 +161,6 @@ function MiCuenta({ sesion }: MiCuentaProps) {
             </div>
           )}
 
-          {/* MENSAJES */}
           {seccion === 'mensajes' && (
             <div className="card border-0 shadow-sm rounded-4 p-4">
               <h4 className="fw-bold mb-4">Mis mensajes</h4>
