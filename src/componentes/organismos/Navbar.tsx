@@ -9,7 +9,7 @@ interface NavbarProps {
 
 function Navbar({ sesion = null, alCerrarSesion }: NavbarProps) {
   const { totalUnidades } = useCarrito();
-  const esAdmin = sesion?.tipo === 'administrador';
+  const esAdmin = sesion?.tipo?.toUpperCase() === 'ADMINISTRADOR';
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow-sm">
