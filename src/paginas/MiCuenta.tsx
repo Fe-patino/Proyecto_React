@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import type { Sesion } from '../sesion'
+import CambiarPassword from '../componentes/moleculas/CambiarPassword'
 
 interface MiCuentaProps {
   sesion: Sesion
@@ -59,6 +60,7 @@ function MiCuenta({ sesion }: MiCuentaProps) {
   return (
     <div className="container my-5">
       <div className="row">
+        {/* Sidebar */}
         <div className="col-12 col-md-3 mb-4">
           <div className="card border-0 shadow-sm rounded-4 p-3">
             <div className="text-center mb-3">
@@ -98,8 +100,10 @@ function MiCuenta({ sesion }: MiCuentaProps) {
           </div>
         </div>
 
+        {/* Contenido */}
         <div className="col-12 col-md-9">
 
+          {/* PERFIL */}
           {seccion === 'perfil' && (
             <div className="card border-0 shadow-sm rounded-4 p-4">
               <h4 className="fw-bold mb-4">Mi perfil</h4>
@@ -117,12 +121,16 @@ function MiCuenta({ sesion }: MiCuentaProps) {
                   {sesion.tipo?.toUpperCase() === 'ADMINISTRADOR' ? 'Administrador' : 'Cliente'}
                 </p>
               </div>
-              <Link className="btn fw-semibold text-white" to="/productos" style={{ backgroundColor: '#f97316', borderColor: '#f97316' }}>
+              <hr />
+              <h5 className="fw-bold mb-3">Cambiar contraseña</h5>
+              <CambiarPassword sesion={sesion} />
+              <Link className="btn fw-semibold text-white mt-3" to="/productos" style={{ backgroundColor: '#f97316', borderColor: '#f97316' }}>
                 Seguir comprando
               </Link>
             </div>
           )}
 
+          {/* PEDIDOS */}
           {seccion === 'pedidos' && (
             <div className="card border-0 shadow-sm rounded-4 p-4">
               <h4 className="fw-bold mb-4">Mis pedidos</h4>
@@ -161,6 +169,7 @@ function MiCuenta({ sesion }: MiCuentaProps) {
             </div>
           )}
 
+          {/* MENSAJES */}
           {seccion === 'mensajes' && (
             <div className="card border-0 shadow-sm rounded-4 p-4">
               <h4 className="fw-bold mb-4">Mis mensajes</h4>
