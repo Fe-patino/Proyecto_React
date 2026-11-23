@@ -46,7 +46,7 @@ function MiCuenta({ sesion }: MiCuentaProps) {
     }
     if (seccion === 'mensajes') {
       setCargandoMensajes(true)
-      fetch('http://localhost:8083/api/contacto')
+      fetch('http://localhost:8083/api/contactos')
         .then(r => r.json())
         .then((data: Contacto[]) => {
           const misMensajes = data.filter(
